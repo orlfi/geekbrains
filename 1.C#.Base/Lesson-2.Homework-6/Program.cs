@@ -7,13 +7,13 @@ namespace Lesson_2.Homework_6
         [Flags]
         public enum DaysOfWeek
         {
-            Monday =     0b_1000000,
-            Tuesday =    0b_0100000,
-            Wednesday =  0b_0010000,
-            Thursday =   0b_0001000,
-            Friday =     0b_0000100,
-            Saturday =   0b_0000010,
-            Sunday =     0b_0000001
+            Monday =    0b_0000001, 
+            Tuesday =   0b_0000010,
+            Wednesday = 0b_0000100,
+            Thursday =  0b_0001000,
+            Friday =    0b_0010000,
+            Saturday =  0b_0100000,
+            Sunday =    0b_1000000
         }
 
         static void Main(string[] args)
