@@ -4,14 +4,14 @@ namespace Lesson_3.Homework_4
 {
     /// <summary>
     /// Вывод карты расположения короблей "Морской бой"
-    /// Использовал string для красивого отображения псевдографики
     /// </summary>
     class Program
     {
         const string COL_NAMES = "   А Б В Г Д Е Ж З И К";
         const int BOARD_SIZE = 10;
-        const string SHIP_CHAR = "\u2588\u2588";
-        const string EMPTY_CHAR = "\u2591\u2591";
+        const char SHIP = 'X';
+        const char EMPTY = 'O';
+        //        const string EMPTY_CHAR = "\u2591\u2591";
 
         enum Directions
         {
@@ -21,7 +21,7 @@ namespace Lesson_3.Homework_4
 
         static void Main(string[] args)
         {
-            string[,] board = new string[BOARD_SIZE, BOARD_SIZE];
+            char[,] board = new char[BOARD_SIZE, BOARD_SIZE];
             int[] shipSizes = { 4, 3, 3, 2, 2, 2, 1, 1, 1, 1 };
 
             for (int i = 0; i < 4; i++)
@@ -32,28 +32,29 @@ namespace Lesson_3.Homework_4
                 Console.WriteLine();
             }
 
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("\r\nPress any key...");
             Console.ReadKey();
         }
 
-        static void FillBoard(string[,] board)
+        static void FillBoard(char[,] board)
         {
             for (int i = 0; i < board.GetLength(0); i++)
             {
                 for (int j = 0; j < board.GetLength(1); j++)
                 {
-                    board[i, j] = EMPTY_CHAR;
+                    board[i, j] = EMPTY;
                 }
             }
 
         }
-        static void PlaceShips(string[,] board, int[] shipSizes)
+        static void PlaceShips(char[,] board, int[] shipSizes)
         {
             for (int i = 0; i < shipSizes.Length; i++)
                 PlaceShip(board, shipSizes[i]);
         }
 
-        static void PlaceShip(string[,] board, int shipSize)
+        static void PlaceShip(char[,] board, int shipSize)
         {
             var rnd = new Random();
             int x;
@@ -70,17 +71,17 @@ namespace Lesson_3.Homework_4
             {
                 if ((Directions)dir == Directions.Horizontal)
                 {
-                    board[x + i, y] = SHIP_CHAR;
+                    board[x + i, y] = SHIP;
                 }
                 else
                 {
-                    board[x, y + i] = SHIP_CHAR;
+                    board[x, y + i] = SHIP;
                 }
 
             }
         }
 
-        static bool Check(int x, int y, Directions dir, int shipSize, string[,] board)
+        static bool Check(int x, int y, Directions dir, int shipSize, char[,] board)
         {
             int checkX;
             int checkY;
@@ -106,7 +107,7 @@ namespace Lesson_3.Homework_4
                     if (checkX < 0 || checkX >= BOARD_SIZE || checkY < 0 || checkY >= BOARD_SIZE)
                         continue;
 
-                    if (board[checkX, checkY] == SHIP_CHAR)
+                    if (board[checkX, checkY] == SHIP)
                         return false;
                 }
             }
@@ -114,8 +115,9 @@ namespace Lesson_3.Homework_4
         }
 
 
-        static void DrawBoard(string[,] board)
+        static void DrawBoard(char[,] board)
         {
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(COL_NAMES);
             for (int i = 0; i < board.GetLength(0); i++)
             {
@@ -123,10 +125,19 @@ namespace Lesson_3.Homework_4
                 {
                     if (j == 0)
                     {
+                        Console.ForegroundColor = ConsoleColor.White;
                         Console.Write($"{i.ToString().PadLeft(2)} ");
                     }
 
-                    Console.Write(board[i, j]);
+                    if (board[i, j] == SHIP)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                    }
+                    Console.Write("\u2588\u2588");
                 }
                 Console.WriteLine();
             }
