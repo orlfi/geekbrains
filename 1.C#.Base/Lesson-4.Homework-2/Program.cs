@@ -17,13 +17,13 @@ namespace Lesson_4.Homework_2
         static string GetNumString()
         {
             Console.WriteLine("Введите набор чисел, разделенных запятой:");
-            return Console.ReadLine().Replace("  ", " ");
+            return Console.ReadLine();
         }
 
         static (int result, string error) GetStringSum(string text)
         {
             int result = 0;
-            string[] arr = text.Split(" ");
+            string[] arr = text.Split(" ", StringSplitOptions.RemoveEmptyEntries);
 
             if (arr.Length < 2)
                 return (result, "Необходимо задать более одного числа");
