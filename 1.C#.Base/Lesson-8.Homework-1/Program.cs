@@ -6,43 +6,34 @@ namespace Lesson_8.Homework_1
 {
     class Program
     {
+        static readonly ResourceManager rm = new ResourceManager("Lesson_8.Homework_1.Properties.TextResources", typeof(Program).Assembly);
+        static readonly Configuration cm = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+        static readonly KeyValueConfigurationCollection settings = cm.AppSettings.Settings;
+
+
         static void Main(string[] args)
         {
-            ResourceManager rm = new ResourceManager("Lesson_8.Homework_1.Properties.TextResources", typeof(Program).Assembly);
+            ReadOrAdd("Name", "NamePrompt", "Greeting");
 
-            var cm = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            var settings = cm.AppSettings.Settings;
+            ReadOrAdd("Age", "AgePrompt", "AgePrefix");
 
-            if (settings["Name"] == null)
-            {
-                Console.Write(rm.GetString("NamePrompt") + ": ");
-                string name = Console.ReadLine();
-                settings.Add(new KeyValueConfigurationElement("Name", name));
-            }
-            else
-                Console.WriteLine(rm.GetString("Greeting"), settings["Name"].Value);
-
-            if (settings["Age"] == null)
-            {
-                Console.Write(rm.GetString("AgePrompt") + ": ");
-                string name = Console.ReadLine();
-                settings.Add(new KeyValueConfigurationElement("Age", name));
-            }
-            else
-                Console.WriteLine(rm.GetString("AgePrefix") + ": ", settings["Age"].Value);
-
-            if (settings["Business"] == null)
-            {
-                Console.Write(rm.GetString("BusinessPrompt") + ": ");
-                string name = Console.ReadLine();
-                settings.Add(new KeyValueConfigurationElement("Business", name));
-            }
-            else
-                Console.WriteLine(rm.GetString("BusinessPrefix") + ": ", settings["Business"].Value);
+            ReadOrAdd("Business", "BusinessPrompt", "BusinessPrefix");
 
             cm.Save(ConfigurationSaveMode.Modified);
             Console.WriteLine("Press any key...");
             Console.ReadKey();
+        }
+
+        static void ReadOrAdd(string name, string prompt, string prefix)
+        {
+            if (settings[name] == null)
+            {
+                Console.Write(rm.GetString(prompt) + ": ");
+                string text = Console.ReadLine();
+                settings.Add(new KeyValueConfigurationElement(name, text));
+            }
+            else
+                Console.WriteLine(rm.GetString(prefix) + ": ", settings[name].Value);
         }
     }
 
