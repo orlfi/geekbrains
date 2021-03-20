@@ -53,6 +53,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lesson-7.Homework1.dotPeek"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lesson-7.Homework1.Source_NF", "Lesson-7.Homework1.Source_NF\Lesson-7.Homework1.Source_NF.csproj", "{C58EF1E5-23E1-43A0-BF01-E75DDB38F81B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lesson-8.Homework-1", "Lesson-8.Homework-1\Lesson-8.Homework-1.csproj", "{B976FF17-2F74-4C4F-8F66-08A6FD548CDF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -159,6 +161,10 @@ Global
 		{C58EF1E5-23E1-43A0-BF01-E75DDB38F81B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C58EF1E5-23E1-43A0-BF01-E75DDB38F81B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C58EF1E5-23E1-43A0-BF01-E75DDB38F81B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B976FF17-2F74-4C4F-8F66-08A6FD548CDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B976FF17-2F74-4C4F-8F66-08A6FD548CDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B976FF17-2F74-4C4F-8F66-08A6FD548CDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B976FF17-2F74-4C4F-8F66-08A6FD548CDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
