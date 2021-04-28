@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>Lesson_2.Homework_2</RootNamespace>
+    <RootNamespace>Homework_1</RootNamespace>
   </PropertyGroup>
 
 </Project>
