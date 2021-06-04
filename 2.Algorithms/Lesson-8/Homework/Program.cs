@@ -19,8 +19,13 @@ namespace Bubble
 
             int[] arr = { 4, 2, 8, 5, 7, 3, 9, 6, 1 };
             Console.WriteLine($"Source array: {string.Join(',', arr)}");
-            Block(arr, 3);
+            HeapSort(arr, arr.Length);
             Console.WriteLine($"Block sorted: {string.Join(',', arr)}");
+
+            int[] arr1 = { 4, 2, 8, 5, 7, 3, 9, 6, 1 };
+            Console.WriteLine($"Source array: {string.Join(',', arr1)}");
+            Block(arr1, 3);
+            Console.WriteLine($"Block sorted: {string.Join(',', arr1)}");
 
             if (!File.Exists(RANDOM_FILE_NAME))
                 File.Delete(RANDOM_FILE_NAME);
@@ -33,6 +38,48 @@ namespace Bubble
             Console.WriteLine("Press any key...");
             Console.ReadKey();
         }
+
+        static void HeapSort(int[] array, int n) //основной метод
+        {
+            //for (int i = n / 2 - 1; i >= 0; i--)
+                for (int i = n -1 ; i >= 0; i--)
+                {
+                    Heapify(array, n, i);
+            }
+
+
+
+            for (int i = n - 1; i >= 0; i--)
+            {
+                int temp = array[0];
+                array[0] = array[i];
+                array[i] = temp;
+                Heapify(array, i, 0);
+            }
+        }
+
+        static void Heapify(int[] array, int n, int i)
+        {
+            int largest = i;
+            int left = (i * 2) + 1;
+            int right = (i * 2) + 2;
+
+            if (left < n && array[left] > array[largest])
+                largest = left;
+
+            if (right < n && array[right] > array[largest])
+                largest = right;
+
+            if (largest != i)
+            {
+                int swap = array[i];
+                array[i] = array[largest];
+                array[largest] = swap;
+                Heapify(array, n, largest);
+            }
+        }
+
+
 
         static void ExternalSort(string source, string destination, int blockSize)
         {
