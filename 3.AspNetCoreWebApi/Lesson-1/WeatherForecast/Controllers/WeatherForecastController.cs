@@ -21,20 +21,20 @@ namespace WeatherForecast.Controllers
         [HttpGet("read")]
         public IActionResult Read([FromQuery] DateTime from, [FromQuery] DateTime to)
         {
-            return Ok(_storage.Data.Where(item => item.Date >= from && item.Date <= to));
+            var result = _storage.Data.Where(item => item.Date >= from && item.Date <= to).ToList();
+            return Ok(result);
         }
 
         [HttpPost("create")]
         public IActionResult Create([FromQuery] DateTime date, [FromQuery] int temperature)
         {
             if (temperature < -273)
-                return NotFound($"The temperature cannot be less than -273 in Celsius");
+                return BadRequest($"The temperature cannot be less than -273 in Celsius");
 
             if (_storage.Data.Exists(item => item.Date == date))
             {
                 return Conflict($"The temperature for the date {date} has already been created");
-            }
-            else
+            } else
             {
                 _storage.Data.Add(new DateTemperature(date, temperature));
                 return Ok();
@@ -45,14 +45,13 @@ namespace WeatherForecast.Controllers
         public IActionResult Update([FromQuery] DateTime date, [FromQuery] int temperature)
         {
             if (temperature < -273)
-                return NotFound($"The temperature cannot be less than -273 in Celsius");
+                return BadRequest($"The temperature cannot be less than -273 in Celsius");
 
             var dateTemperature = _storage.Data.FirstOrDefault(item => item.Date == date);
             if (dateTemperature == null)
             {
-                return NotFound($"Update error! Temperature for date {date} not found");
-            }
-            else
+                return BadRequest($"Update error! Temperature for date {date} not found");
+            } else
             {
                 dateTemperature.Temperature = temperature;
                 return Ok();
