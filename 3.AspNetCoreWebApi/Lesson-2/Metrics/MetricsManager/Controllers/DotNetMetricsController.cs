@@ -11,16 +11,16 @@ namespace MetricsManager.Controllers
     [ApiController]
     public class DotNetMetricsController : ControllerBase
     {
-        [HttpGet("agent/{agentId}/from/{from}/to/{to}")]
-        public IActionResult GetMetricsFromAgent([FromRoute] int agentId, [FromRoute] DateTime from, [FromRoute] DateTime to)
+        [HttpGet("agent/{agentId}/errors-count/from/{fromTime}/to/{toTime}")]
+        public IActionResult GetMetricsFromAgent([FromRoute] int agentId, [FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
         {
-            return Ok();
+            return Ok(new { AgentId = agentId, From = fromTime, To = toTime});
         }
 
-        [HttpGet("cluster/from/{from}/to/{to}")]
-        public IActionResult GetMetricsFromAllCluster([FromRoute] DateTime from, DateTime to)
+        [HttpGet("cluster/errors-count/from/{fromTime}/to/{toTime}")]
+        public IActionResult GetMetricsFromAllCluster([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
         {
-            return Ok();
+            return Ok(new { From = fromTime, To = toTime});
         }
     }
 }

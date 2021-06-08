@@ -11,5 +11,10 @@ namespace MetricsAgent.Controllers
     [ApiController]
     public class DotNetMetricsController : ControllerBase
     {
+        [HttpGet("errors-count/from/{fromTime}/to/{toTime}")]
+        public IActionResult GetMetrics([FromRoute] TimeSpan fromTime, TimeSpan toTime)
+        {
+            return Ok(new { From = fromTime, To = toTime});
+        }
     }
 }
