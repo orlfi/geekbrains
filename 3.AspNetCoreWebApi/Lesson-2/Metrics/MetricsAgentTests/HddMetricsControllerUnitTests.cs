@@ -5,14 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MetricsAgentTests
 {
-    public class CpuMetricsControllerUnitTests
+    public class HddMetricsControllerUnitTests
     {
 
-        CpuMetricsController _controller;
+        HddMetricsController _controller;
 
-        public CpuMetricsControllerUnitTests()
+        public HddMetricsControllerUnitTests()
         {
-            _controller = new CpuMetricsController();
+            _controller = new HddMetricsController();
         }
 
         [Fact]
