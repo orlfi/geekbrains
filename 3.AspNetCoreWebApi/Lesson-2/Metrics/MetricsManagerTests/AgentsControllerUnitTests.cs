@@ -45,7 +45,7 @@ namespace MetricsManagerTests
         [Fact]
         public void RegisterAgent_ReturnsOK()
         {
-            AgentInfo agentInfo = new AgentInfo()
+            var agentInfo = new AgentInfo()
             {
                 AgentId = 1,
                 AgentAdress = new Uri(@"http:\\192.168.1.2:5000")
