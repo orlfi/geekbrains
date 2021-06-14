@@ -23,7 +23,7 @@ namespace MetricsAgent
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "Stopped program because of exception");
+                logger.Fatal(ex, "Host terminated unexpectedly");
                 throw;
             }
             finally

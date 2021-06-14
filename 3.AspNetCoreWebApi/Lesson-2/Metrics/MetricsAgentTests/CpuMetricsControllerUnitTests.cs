@@ -7,7 +7,6 @@ namespace MetricsAgentTests
 {
     public class CpuMetricsControllerUnitTests
     {
-
         CpuMetricsController _controller;
 
         public CpuMetricsControllerUnitTests()
