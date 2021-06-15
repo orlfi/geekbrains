@@ -1,3 +1,6 @@
 {
-    "dotnet-test-explorer.treeMode": "full"
+    "dotnet-test-explorer.treeMode": "full",
+    "cSpell.words": [
+        "Xunit"
+    ]
 }

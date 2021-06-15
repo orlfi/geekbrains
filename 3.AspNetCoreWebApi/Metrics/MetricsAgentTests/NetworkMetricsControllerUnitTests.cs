@@ -11,17 +11,17 @@ using Microsoft.Extensions.Logging;
 
 namespace MetricsAgentTests
 {
-    public class RamMetricsControllerUnitTests
+    public class NetworkMetricsControllerUnitTests
     {
-        private readonly Mock<IRamMetricsRepository> _mockRepository;
-        private readonly Mock<ILogger<RamMetricsController>> _mockLogger;
-        private readonly RamMetricsController _controller;
+        private readonly Mock<INetworkMetricsRepository> _mockRepository;
+        private readonly Mock<ILogger<NetworkMetricsController>> _mockLogger;
+        private readonly NetworkMetricsController _controller;
 
-        public RamMetricsControllerUnitTests()
+        public NetworkMetricsControllerUnitTests()
         {
-            _mockRepository = new Mock<IRamMetricsRepository>();
-            _mockLogger = new Mock<ILogger<RamMetricsController>>();
-            _controller = new RamMetricsController(_mockRepository.Object, _mockLogger.Object);
+            _mockRepository = new Mock<INetworkMetricsRepository>();
+            _mockLogger = new Mock<ILogger<NetworkMetricsController>>();
+            _controller = new NetworkMetricsController(_mockRepository.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -29,10 +29,10 @@ namespace MetricsAgentTests
         {
             var fromTime = DateTimeOffset.Now.AddDays(-5);
             var toTime = DateTimeOffset.Now;
-            var metrics = new List<RamMetric>
+            var metrics = new List<NetworkMetric>
             {
-                new RamMetric {Id = 1, Value = 10, Time = DateTimeOffset.Now.AddDays(-5)},
-                new RamMetric {Id = 1, Value = 50, Time = DateTimeOffset.Now.AddDays(-4)}
+                new NetworkMetric {Id = 1, Value = 10, Time = DateTimeOffset.Now.AddDays(-5)},
+                new NetworkMetric {Id = 1, Value = 50, Time = DateTimeOffset.Now.AddDays(-4)}
             };
             _mockRepository.Setup(repository => repository.GetByPeriod(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>())).Returns(metrics);
 
@@ -46,10 +46,10 @@ namespace MetricsAgentTests
         {
             var fromTime = DateTimeOffset.Now.AddDays(-5);
             var toTime = DateTimeOffset.Now;
-            var metrics = new List<RamMetric>
+            var metrics = new List<NetworkMetric>
             {
-                new RamMetric {Id = 1, Value = 10, Time = DateTimeOffset.Now.AddDays(-5)},
-                new RamMetric {Id = 1, Value = 50, Time = DateTimeOffset.Now.AddDays(-4)}
+                new NetworkMetric {Id = 1, Value = 10, Time = DateTimeOffset.Now.AddDays(-5)},
+                new NetworkMetric {Id = 1, Value = 50, Time = DateTimeOffset.Now.AddDays(-4)}
             };
             _mockRepository.Setup(repository => repository.GetByPeriod(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>())).Returns(metrics);
             var logText = $"Parameters: fromTime={fromTime} toTime={toTime}";
@@ -68,7 +68,7 @@ namespace MetricsAgentTests
         [Fact]
         public void Create_ReturnOk()
         {
-            var request = new RamMetricCreateRequest
+            var request = new NetworkMetricCreateRequest
             {
                 Value = 50,
                 Time = DateTimeOffset.Now.AddDays(-5)
@@ -82,7 +82,7 @@ namespace MetricsAgentTests
         [Fact]
         public void Create_ShouldCall_Create_From_Repository()
         {
-            var request = new RamMetricCreateRequest
+            var request = new NetworkMetricCreateRequest
             {
                 Value = 50,
                 Time = DateTimeOffset.Now.AddDays(-5)
@@ -90,13 +90,13 @@ namespace MetricsAgentTests
 
             var result = _controller.Create(request);
 
-            _mockRepository.Verify(repository => repository.Create(It.IsAny<RamMetric>()), Times.AtLeastOnce());
+            _mockRepository.Verify(repository => repository.Create(It.IsAny<NetworkMetric>()), Times.AtLeastOnce());
         }
 
         [Fact]
         public void Create_ShouldNotCall_Create_From_Repository_If_Value_Not_Between_0_100()
         {
-            var request = new RamMetricCreateRequest
+            var request = new NetworkMetricCreateRequest
             {
                 Value = 500,
                 Time = DateTimeOffset.Now.AddDays(-5)
@@ -104,13 +104,13 @@ namespace MetricsAgentTests
 
             var result = _controller.Create(request);
 
-            _mockRepository.Verify(repository => repository.Create(It.IsAny<RamMetric>()), Times.Never());
+            _mockRepository.Verify(repository => repository.Create(It.IsAny<NetworkMetric>()), Times.Never());
         }
 
         [Fact]
         public void Create_ShouldCall_LogInformation()
         {
-            var request = new RamMetricCreateRequest
+            var request = new NetworkMetricCreateRequest
             {
                 Value = 50,
                 Time = DateTimeOffset.Now.AddDays(-5)

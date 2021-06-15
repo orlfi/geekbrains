@@ -18,6 +18,8 @@ namespace MetricsAgent
 {
     public class Startup
     {
+        private readonly string[] _tableNames = { "CpuMetrics", "DotNetMetrics", "RamMetrics", "NetworkMetrics", "HddMetrics" };
+
         private const int initRowCount = 10;
 
         public Startup(IConfiguration configuration)
@@ -31,48 +33,56 @@ namespace MetricsAgent
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            ConfigureSqlLiteConnection(services);
+            ConfigureSqlLiteConnection();
             services.AddScoped<ICpuMetricsRepository, CpuMetricsRepository>();
+            services.AddScoped<IDotNetMetricsRepository, DotNetMetricsRepository>();
+            services.AddScoped<IHddMetricsRepository, HddMetricsRepository>();
+            services.AddScoped<IRamMetricsRepository, RamMetricsRepository>();
+            services.AddScoped<INetworkMetricsRepository, NetworkMetricsRepository>();
             services.AddSingleton<IConfiguration>(Configuration);
         }
 
-        private void ConfigureSqlLiteConnection(IServiceCollection services)
+        private void ConfigureSqlLiteConnection()
         {
             var connectionString = Configuration.GetConnectionString("SqlLiteMetricsDatabase");
-            var connection = new SQLiteConnection(connectionString);
+            using var connection = new SQLiteConnection(connectionString);
             connection.Open();
             PrepareSchema(connection);
         }
 
         private void PrepareSchema(SQLiteConnection connection)
         {
-            using (var command = new SQLiteCommand(connection))
+            using var command = new SQLiteCommand(connection);
+            int month = 6;
+            foreach (var item in _tableNames)
             {
                 var initializeWithDataFlag = Configuration.GetValue<bool>("InitializeWithData");
                 if (initializeWithDataFlag)
                 {
-                    command.CommandText = "DROP TABLE IF EXISTS CpuMetrics";
+                    command.CommandText = $"DROP TABLE IF EXISTS {item}";
                     command.ExecuteNonQuery();
+
                 }
 
-                command.CommandText = @"CREATE TABLE IF NOT EXISTS CpuMetrics(Id INTEGER PRIMARY KEY, Value INT, Time INTEGER)";
+                command.CommandText = $"CREATE TABLE IF NOT EXISTS {item}(Id INTEGER PRIMARY KEY, Value INT, Time INTEGER)";
                 command.ExecuteNonQuery();
 
                 if (initializeWithDataFlag)
                 {
-                    InitializeWithData(command);
+                    InitializeTableWithData(item, month++, command);
                 }
+
             }
         }
 
-        private void InitializeWithData(SQLiteCommand command)
+        private void InitializeTableWithData(string tableName, int month, SQLiteCommand command)
         {
             Random rnd = new Random();
-            var time = new DateTimeOffset(2021, 06, DateTimeOffset.Now.Date.Day, DateTimeOffset.Now.Hour, 0, 0, TimeSpan.FromHours(3));
-            for (int i =0; i< initRowCount; i++)
+            var time = new DateTimeOffset(2021, month, DateTimeOffset.Now.Date.Day, DateTimeOffset.Now.Hour, 0, 0, TimeSpan.FromHours(3));
+            for (int i = 0; i < initRowCount; i++)
             {
-                var value =  rnd.Next(1, 10) * 10 ;
-                command.CommandText = $"INSERT INTO CpuMetrics(Value, Time) VALUES ({value}, {time.ToUnixTimeMilliseconds()})";
+                var value = rnd.Next(1, 10) * 10;
+                command.CommandText = $"INSERT INTO {tableName}(Value, Time) VALUES ({value}, {time.ToUnixTimeSeconds()})";
                 command.ExecuteNonQuery();
                 time = time.AddMinutes(10);
             }

@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace MetricsAgent.DAL.Models
+namespace MetricsAgent.DAL.Responses
 {
-    public class NetworkMetric
+    public class HddMetricDTO
     {
         public int Id { get; set; }
 

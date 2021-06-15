@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MetricsAgent.DTO.Requests
+namespace MetricsAgent.DAL.Responses
 {
-    public class CpuMetricCreateRequest
+    public class RamMetricDTO
     {
+        public int Id { get; set; }
+
         public int Value { get; set; }
+
         public DateTimeOffset Time { get; set; }
     }
 }

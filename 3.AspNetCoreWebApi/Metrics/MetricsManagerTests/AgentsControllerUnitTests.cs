@@ -8,7 +8,7 @@ namespace MetricsManagerTests
 {
     public class AgentsControllerUnitTests
     {
-        private AgentsController _controller;
+        private readonly AgentsController _controller;
         public AgentsControllerUnitTests()
         {
             _controller = new AgentsController();
@@ -48,7 +48,7 @@ namespace MetricsManagerTests
             var agentInfo = new AgentInfo()
             {
                 AgentId = 1,
-                AgentAdress = new Uri(@"http:\\192.168.1.2:5000")
+                AgentAddress = new Uri(@"http:\\192.168.1.2:5000")
             };
 
             var result = _controller.RegisterAgent(agentInfo);

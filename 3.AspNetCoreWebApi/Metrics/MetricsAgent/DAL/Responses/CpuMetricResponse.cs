@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MetricsAgent.DTO.Responses
+namespace MetricsAgent.DAL.Responses
 {
-    public class AllCpuMetricResponse
+    public class CpuMetricResponse
     {
         public List<CpuMetricDTO> Metrics { get; set; } = new List<CpuMetricDTO>();
     }

@@ -4,10 +4,10 @@ namespace MetricsAgent.DAL.Models
 {
     public class HddMetric
     {
-        int Id { get; set; }
+        public int Id { get; set; }
 
-        int Value { get; set; }
+        public int Value { get; set; }
 
-        TimeSpan Time { get; set; }
+        public DateTimeOffset Time { get; set; }
     }
 }

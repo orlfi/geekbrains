@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MetricsAgent.DAL.Interfaces;
 using MetricsAgent.DAL.Models;
-using MetricsAgent.DTO.Requests;
-using MetricsAgent.DTO.Responses;
+using MetricsAgent.DAL.Requests;
+using MetricsAgent.DAL.Responses;
 
 namespace MetricsAgent.Controllers
 {
@@ -16,8 +16,8 @@ namespace MetricsAgent.Controllers
     [ApiController]
     public class CpuMetricsController : ControllerBase
     {
-        private ICpuMetricsRepository _repository;
-        private ILogger<CpuMetricsController> _logger;
+        private readonly ICpuMetricsRepository _repository;
+        private readonly ILogger<CpuMetricsController> _logger;
         
         public CpuMetricsController(ICpuMetricsRepository repository, ILogger<CpuMetricsController> logger)
         {
@@ -28,13 +28,13 @@ namespace MetricsAgent.Controllers
         }
 
         [HttpGet("from/{fromTime}/to/{toTime}")]
-        public IActionResult GetByPeriod([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
+        public IActionResult GetMetricsByPeriod([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
         {
             _logger.LogInformation($"Parameters: fromTime={fromTime} toTime={toTime}");
 
             var metricsList = _repository.GetByPeriod(fromTime, toTime);
 
-            var response = new AllCpuMetricResponse();
+            var response = new CpuMetricResponse();
 
             foreach (var item in metricsList)
             {
@@ -58,13 +58,13 @@ namespace MetricsAgent.Controllers
             if (request.Value < 0 || request.Value > 100)
                 return BadRequest("The Value must be in the range from 0 to 100");
 
-            CpuMetric cpuMetric = new CpuMetric()
+            CpuMetric metric = new CpuMetric()
             {
                 Value = request.Value,
                 Time = request.Time
             };
 
-            _repository.Create(cpuMetric);
+            _repository.Create(metric);
 
             return Ok();
         }

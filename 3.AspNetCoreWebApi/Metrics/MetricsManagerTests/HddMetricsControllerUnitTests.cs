@@ -7,7 +7,7 @@ namespace MetricsManagerTests
 {
     public class HddMetricsControllerUnitTests
     {
-        private HddMetricsController _controller;
+        private readonly HddMetricsController _controller;
         public HddMetricsControllerUnitTests()
         {
             _controller = new HddMetricsController();
@@ -17,8 +17,8 @@ namespace MetricsManagerTests
         public void GetMetricsFromAgent_ReturnsOK()
         {
             int agentId = 1;
-            var fromTime = TimeSpan.FromSeconds(0);
-            var toTime = TimeSpan.FromSeconds(100);
+            var fromTime = DateTimeOffset.Now.AddDays(-5);
+            var toTime =  DateTimeOffset.Now;
 
             var result = _controller.GetMetricsFromAgent(agentId, fromTime, toTime);
 
@@ -28,8 +28,8 @@ namespace MetricsManagerTests
         [Fact]
         public void GetMetricsFromCluster_ReturnsOK()
         {
-            var fromTime = TimeSpan.FromSeconds(0);
-            var toTime = TimeSpan.FromSeconds(100);
+            var fromTime = DateTimeOffset.Now.AddDays(-5);
+            var toTime =  DateTimeOffset.Now;
 
             var result = _controller.GetMetricsFromAllCluster(fromTime, toTime);
 
