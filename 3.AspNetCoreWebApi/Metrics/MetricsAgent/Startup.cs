@@ -39,7 +39,6 @@ namespace MetricsAgent
             services.AddScoped<IHddMetricsRepository, HddMetricsRepository>();
             services.AddScoped<IRamMetricsRepository, RamMetricsRepository>();
             services.AddScoped<INetworkMetricsRepository, NetworkMetricsRepository>();
-            services.AddSingleton<IConfiguration>(Configuration);
         }
 
         private void ConfigureSqlLiteConnection()

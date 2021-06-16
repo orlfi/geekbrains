@@ -13,10 +13,7 @@ namespace MetricsAgent.DAL.Repositories
     public class DotNetMetricsRepository : IDotNetMetricsRepository
     {
         private readonly IConfiguration _configuration;
-        public DotNetMetricsRepository(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        public DotNetMetricsRepository(IConfiguration configuration) => _configuration = configuration;
 
         public void Create(DotNetMetric item)
         {

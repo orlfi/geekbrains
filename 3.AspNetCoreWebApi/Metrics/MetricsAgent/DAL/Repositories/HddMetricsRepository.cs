@@ -13,10 +13,7 @@ namespace MetricsAgent.DAL.Repositories
     public class HddMetricsRepository : IHddMetricsRepository
     {
         private readonly IConfiguration _configuration;
-        public HddMetricsRepository(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        public HddMetricsRepository(IConfiguration configuration) => _configuration = configuration;
 
         public void Create(HddMetric item)
         {

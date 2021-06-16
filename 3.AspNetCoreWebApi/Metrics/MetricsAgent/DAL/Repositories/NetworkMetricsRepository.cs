@@ -13,10 +13,7 @@ namespace MetricsAgent.DAL.Repositories
     public class NetworkMetricsRepository : INetworkMetricsRepository
     {
         private readonly IConfiguration _configuration;
-        public NetworkMetricsRepository(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        public NetworkMetricsRepository(IConfiguration configuration) => _configuration = configuration;
 
         public void Create(NetworkMetric item)
         {

@@ -13,10 +13,7 @@ namespace MetricsAgent.DAL.Repositories
     public class RamMetricsRepository : IRamMetricsRepository
     {
         private readonly IConfiguration _configuration;
-        public RamMetricsRepository(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        public RamMetricsRepository(IConfiguration configuration) => _configuration = configuration;
 
         public void Create(RamMetric item)
         {

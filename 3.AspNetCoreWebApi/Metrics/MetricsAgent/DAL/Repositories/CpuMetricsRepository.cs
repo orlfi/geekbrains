@@ -13,10 +13,7 @@ namespace MetricsAgent.DAL.Repositories
     public class CpuMetricsRepository : ICpuMetricsRepository
     {
         private readonly IConfiguration _configuration;
-        public CpuMetricsRepository(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        public CpuMetricsRepository(IConfiguration configuration) => _configuration = configuration;
 
         public void Create(CpuMetric item)
         {
