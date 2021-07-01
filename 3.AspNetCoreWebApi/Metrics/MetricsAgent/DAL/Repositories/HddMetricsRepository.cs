@@ -12,14 +12,13 @@ namespace MetricsAgent.DAL.Repositories
 {
     public class HddMetricsRepository : IHddMetricsRepository
     {
-        private readonly IConfiguration _configuration;
-        public HddMetricsRepository(IConfiguration configuration) => _configuration = configuration;
+        private readonly IConnectionManager _connectionManager;
+
+        public HddMetricsRepository(IConnectionManager connectionManager) => _connectionManager = connectionManager;
 
         public void Create(HddMetric item)
         {
-            var connectionString = _configuration.GetConnectionString("SqlLiteMetricsDatabase");
-            using var connection = new SQLiteConnection(connectionString);
-            connection.Open();
+            using var connection = _connectionManager.CreateOpenedConnection();
 
             using var command = new SQLiteCommand(connection);
             command.CommandText = $"INSERT INTO HddMetrics(Value, Time) VALUES ({item.Value}, {item.Time.ToUnixTimeSeconds()})";
@@ -28,9 +27,7 @@ namespace MetricsAgent.DAL.Repositories
 
         public IList<HddMetric> GetByPeriod(DateTimeOffset fromTime, DateTimeOffset toTime)
         {
-            var connectionString = _configuration.GetConnectionString("SqlLiteMetricsDatabase");
-            using var connection = new SQLiteConnection(connectionString);
-            connection.Open();
+            using var connection = _connectionManager.CreateOpenedConnection();
 
             using var command = new SQLiteCommand(connection);
             command.CommandText = $"SELECT Id, Value, Time FROM HddMetrics WHERE Time >= {fromTime.ToUnixTimeSeconds()} AND Time <= {toTime.ToUnixTimeSeconds()}";

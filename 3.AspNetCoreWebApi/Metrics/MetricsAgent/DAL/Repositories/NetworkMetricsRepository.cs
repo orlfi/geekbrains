@@ -12,14 +12,13 @@ namespace MetricsAgent.DAL.Repositories
 {
     public class NetworkMetricsRepository : INetworkMetricsRepository
     {
-        private readonly IConfiguration _configuration;
-        public NetworkMetricsRepository(IConfiguration configuration) => _configuration = configuration;
+        private readonly IConnectionManager _connectionManager;
+
+        public NetworkMetricsRepository(IConnectionManager connectionManager) => _connectionManager = connectionManager;
 
         public void Create(NetworkMetric item)
         {
-            var connectionString = _configuration.GetConnectionString("SqlLiteMetricsDatabase");
-            using var connection = new SQLiteConnection(connectionString);
-            connection.Open();
+            using var connection = _connectionManager.CreateOpenedConnection();
 
             using var command = new SQLiteCommand(connection);
             command.CommandText = $"INSERT INTO NetworkMetrics(Value, Time) VALUES ({item.Value}, {item.Time.ToUnixTimeSeconds()})";
@@ -28,9 +27,7 @@ namespace MetricsAgent.DAL.Repositories
 
         public IList<NetworkMetric> GetByPeriod(DateTimeOffset fromTime, DateTimeOffset toTime)
         {
-            var connectionString = _configuration.GetConnectionString("SqlLiteMetricsDatabase");
-            using var connection = new SQLiteConnection(connectionString);
-            connection.Open();
+            using var connection = _connectionManager.CreateOpenedConnection();
 
             using var command = new SQLiteCommand(connection);
             command.CommandText = $"SELECT Id, Value, Time FROM NetworkMetrics WHERE Time >= {fromTime.ToUnixTimeSeconds()} AND Time <= {toTime.ToUnixTimeSeconds()}";

@@ -12,14 +12,13 @@ namespace MetricsAgent.DAL.Repositories
 {
     public class RamMetricsRepository : IRamMetricsRepository
     {
-        private readonly IConfiguration _configuration;
-        public RamMetricsRepository(IConfiguration configuration) => _configuration = configuration;
+        private readonly IConnectionManager _connectionManager;
+
+        public RamMetricsRepository(IConnectionManager connectionManager) => _connectionManager = connectionManager;
 
         public void Create(RamMetric item)
         {
-            var connectionString = _configuration.GetConnectionString("SqlLiteMetricsDatabase");
-            using var connection = new SQLiteConnection(connectionString);
-            connection.Open();
+            using var connection = _connectionManager.CreateOpenedConnection(); ;
 
             using var command = new SQLiteCommand(connection);
             command.CommandText = $"INSERT INTO RamMetrics(Value, Time) VALUES ({item.Value}, {item.Time.ToUnixTimeSeconds()})";
@@ -28,9 +27,7 @@ namespace MetricsAgent.DAL.Repositories
 
         public IList<RamMetric> GetByPeriod(DateTimeOffset fromTime, DateTimeOffset toTime)
         {
-            var connectionString = _configuration.GetConnectionString("SqlLiteMetricsDatabase");
-            using var connection = new SQLiteConnection(connectionString);
-            connection.Open();
+            using var connection = _connectionManager.CreateOpenedConnection();
 
             using var command = new SQLiteCommand(connection);
             command.CommandText = $"SELECT Id, Value, Time FROM RamMetrics WHERE Time >= {fromTime.ToUnixTimeSeconds()} AND Time <= {toTime.ToUnixTimeSeconds()}";
