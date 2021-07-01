@@ -4,7 +4,7 @@ using Xunit;
 using MetricsAgent.Controllers;
 using MetricsAgent.DAL.Models;
 using MetricsAgent.DAL.Interfaces;
-using MetricsAgent.DAL.Requests;
+using MetricsAgent.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Microsoft.Extensions.Logging;

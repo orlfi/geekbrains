@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MetricsAgent.DAL.Interfaces;
 using MetricsAgent.DAL.Models;
-using MetricsAgent.DAL.Requests;
-using MetricsAgent.DAL.Responses;
+using MetricsAgent.Requests;
+using MetricsAgent.Responses;
 
 namespace MetricsAgent.Controllers
 {
@@ -39,7 +39,7 @@ namespace MetricsAgent.Controllers
             foreach (var item in metricsList)
             {
 
-                response.Metrics.Add(new CpuMetricDTO
+                response.Metrics.Add(new CpuMetricDto
                 {
                     Id = item.Id,
                     Value = item.Value,
