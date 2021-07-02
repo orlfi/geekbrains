@@ -1,0 +1,38 @@
+﻿FileCommander is an entry-level console two-panel file manager.
+
+Management:
+Enter      Change a directory, start the program
+Shift+F1   Change the disk in the left panel
+Shift+F2   Change the disk in the right panel
+F9         Change the disk in the active panel
+UP         Directory navigation up, command history up
+DOWN       Directory navigation down, command history down
+Page UP    Move to page up
+Page Down  Move to page down
+HOME       Move to the beginning of the folder
+END        Move to the end of the folder
+
+Selecting files:
+SPACE      Select / deselect a file or directory
+NUM +      Select all files and directories in the active panel
+NUM-       Deselect all files and directories in the active panel
+NUM *      Inversion of file and directory selection
+
+File operations:
+F5         Copy files and directories recursively
+F6         Move files and directories recursively
+F7         Creating a folder
+F8 or Del  Delete files and directories recursively
+
+Command line:
+Ctrl+Enter Copy the file name under the cursor to the command line
+A-Z, 1-0   Go to the command set on the command line
+ESC        Exit from the command line
+Enter      Command execution
+
+Command line commands:
+HELP       Output of the help window
+CD         Move to another folder (cd <absolute path>)
+CP         Copying files and directories (cp <source> <destination>)
+MV         Moving files and directories (mv <source> <destination>)
+RM         Deleting files and directories (rm <absolute path>)
