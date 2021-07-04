@@ -9,6 +9,7 @@ using MetricsAgent.DAL.Interfaces;
 using MetricsAgent.DAL.Models;
 using MetricsAgent.Requests;
 using MetricsAgent.Responses;
+using AutoMapper;
 
 namespace MetricsAgent.Controllers
 {
@@ -18,11 +19,13 @@ namespace MetricsAgent.Controllers
     {
         private readonly IDotNetMetricsRepository _repository;
         private readonly ILogger<DotNetMetricsController> _logger;
+        private readonly IMapper _mapper;
 
-        public DotNetMetricsController(IDotNetMetricsRepository repository, ILogger<DotNetMetricsController> logger)
+        public DotNetMetricsController(IDotNetMetricsRepository repository, ILogger<DotNetMetricsController> logger, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
+            _mapper = mapper;
 
             _logger.LogDebug(1, "Logger dependency injected to DotNetMetricsController");
         }
@@ -36,15 +39,7 @@ namespace MetricsAgent.Controllers
 
             var response = new DotNetMetricResponse();
 
-            foreach (var item in metricsList)
-            {
-                response.Metrics.Add(new DotNetMetricDto
-                {
-                    Id = item.Id,
-                    Value = item.Value,
-                    Time = item.Time
-                });
-            }
+            response.Metrics.AddRange(_mapper.Map<List<DotNetMetricDto>>(metricsList));
 
             return Ok(response);
         }
@@ -57,13 +52,7 @@ namespace MetricsAgent.Controllers
             if (request.Value < 0)
                 return BadRequest("The Value must be greater than or equal to 0");
 
-            DotNetMetric metric = new DotNetMetric()
-            {
-                Value = request.Value,
-                Time = request.Time
-            };
-
-            _repository.Create(metric);
+            _repository.Create(_mapper.Map<DotNetMetric>(request));
 
             return Ok();
         }

@@ -9,6 +9,7 @@ using MetricsAgent.DAL.Interfaces;
 using MetricsAgent.DAL.Models;
 using MetricsAgent.Requests;
 using MetricsAgent.Responses;
+using AutoMapper;
 
 namespace MetricsAgent.Controllers
 {
@@ -18,12 +19,14 @@ namespace MetricsAgent.Controllers
     {
         private readonly IRamMetricsRepository _repository;
         private readonly ILogger<RamMetricsController> _logger;
+        private readonly IMapper _mapper;
 
-        public RamMetricsController(IRamMetricsRepository repository, ILogger<RamMetricsController> logger)
+        public RamMetricsController(IRamMetricsRepository repository, ILogger<RamMetricsController> logger, IMapper mapper)
         {
             _repository = repository;
-
             _logger = logger;
+            _mapper = mapper;
+
             _logger.LogDebug(1, "Logger dependency injected to RamMetricsController");
         }
 
@@ -36,16 +39,7 @@ namespace MetricsAgent.Controllers
 
             var response = new RamMetricResponse();
 
-            foreach (var item in metricsList)
-            {
-
-                response.Metrics.Add(new RamMetricDto
-                {
-                    Id = item.Id,
-                    Value = item.Value,
-                    Time = item.Time
-                });
-            }
+            response.Metrics.AddRange(_mapper.Map<List<RamMetricDto>>(metricsList));
 
             return Ok(response);
         }
@@ -58,13 +52,7 @@ namespace MetricsAgent.Controllers
             if (request.Value < 0 || request.Value > 100)
                 return BadRequest("The Value must be in the range from 0 to 100");
 
-            RamMetric metric = new RamMetric()
-            {
-                Value = request.Value,
-                Time = request.Time
-            };
-
-            _repository.Create(metric);
+            _repository.Create(_mapper.Map<RamMetric>(request));
 
             return Ok();
         }

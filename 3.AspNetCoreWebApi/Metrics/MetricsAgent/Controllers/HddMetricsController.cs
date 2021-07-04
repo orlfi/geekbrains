@@ -9,6 +9,7 @@ using MetricsAgent.DAL.Interfaces;
 using MetricsAgent.DAL.Models;
 using MetricsAgent.Requests;
 using MetricsAgent.Responses;
+using AutoMapper;
 
 namespace MetricsAgent.Controllers
 {
@@ -18,11 +19,13 @@ namespace MetricsAgent.Controllers
     {
         private readonly IHddMetricsRepository _repository;
         private readonly ILogger<HddMetricsController> _logger;
+        private readonly IMapper _mapper;
 
-        public HddMetricsController(IHddMetricsRepository repository, ILogger<HddMetricsController> logger)
+        public HddMetricsController(IHddMetricsRepository repository, ILogger<HddMetricsController> logger, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
+            _mapper = mapper;
 
             _logger.LogDebug(1, "Logger dependency injected to HddMetricsController");
         }
@@ -36,16 +39,7 @@ namespace MetricsAgent.Controllers
 
             var response = new HddMetricResponse();
 
-            foreach (var item in metricsList)
-            {
-
-                response.Metrics.Add(new HddMetricDto
-                {
-                    Id = item.Id,
-                    Value = item.Value,
-                    Time = item.Time
-                });
-            }
+            response.Metrics.AddRange(_mapper.Map<List<HddMetricDto>>(metricsList));
 
             return Ok(response);
         }
@@ -58,14 +52,8 @@ namespace MetricsAgent.Controllers
             if (request.Value < 0 || request.Value > 100)
                 return BadRequest("The Value must be in the range from 0 to 100");
 
-            HddMetric metric = new HddMetric()
-            {
-                Value = request.Value,
-                Time = request.Time
-            };
-
-            _repository.Create(metric);
-
+            _repository.Create(_mapper.Map<HddMetric>(request));
+            
             return Ok();
         }
     }

@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using AutoMapper;
 using MetricsAgent.DAL.Interfaces;
 using MetricsAgent.DAL.Models;
 using MetricsAgent.Requests;
 using MetricsAgent.Responses;
+using MetricsAgent.Requests.Get;
 
 namespace MetricsAgent.Controllers
 {
@@ -18,34 +20,27 @@ namespace MetricsAgent.Controllers
     {
         private readonly ICpuMetricsRepository _repository;
         private readonly ILogger<CpuMetricsController> _logger;
-        
-        public CpuMetricsController(ICpuMetricsRepository repository, ILogger<CpuMetricsController> logger)
+        private readonly IMapper _mapper;
+
+        public CpuMetricsController(ICpuMetricsRepository repository, ILogger<CpuMetricsController> logger, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
+            _mapper= mapper;
 
             _logger.LogDebug(1,"Logger dependency injected to CpuMetricsController");
         }
 
         [HttpGet("from/{fromTime}/to/{toTime}")]
-        public IActionResult GetMetricsByPeriod([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
+        public IActionResult GetMetricsByPeriod([FromRoute] CpuMetricsGetByPeriodRequest request)
         {
-            _logger.LogInformation($"Parameters: fromTime={fromTime} toTime={toTime}");
+            _logger.LogInformation($"Parameters: {request}");
 
-            var metricsList = _repository.GetByPeriod(fromTime, toTime);
+            var metricsList = _repository.GetByPeriod(request.FromTime, request.ToTime);
 
             var response = new CpuMetricResponse();
 
-            foreach (var item in metricsList)
-            {
-
-                response.Metrics.Add(new CpuMetricDto
-                {
-                    Id = item.Id,
-                    Value = item.Value,
-                    Time = item.Time
-                });
-            }
+            response.Metrics.AddRange(_mapper.Map<List<CpuMetricDto>>(metricsList));
 
             return Ok(response);
         }
@@ -58,13 +53,7 @@ namespace MetricsAgent.Controllers
             if (request.Value < 0 || request.Value > 100)
                 return BadRequest("The Value must be in the range from 0 to 100");
 
-            CpuMetric metric = new CpuMetric()
-            {
-                Value = request.Value,
-                Time = request.Time
-            };
-
-            _repository.Create(metric);
+            _repository.Create(_mapper.Map<CpuMetric>(request));
 
             return Ok();
         }

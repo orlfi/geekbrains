@@ -1,11 +1,10 @@
 ﻿using System;
-using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using Core.Interfaces;
 using MetricsAgent.DAL.Interfaces;
 using MetricsAgent.DAL.Models;
-using System.Data.SQLite;
-
+using System.Linq;
+using Dapper;
 
 namespace MetricsAgent.DAL.Repositories
 {
@@ -19,32 +18,24 @@ namespace MetricsAgent.DAL.Repositories
         {
             using var connection = _connectionManager.CreateOpenedConnection();
 
-            using var command = new SQLiteCommand(connection);
-            command.CommandText = $"INSERT INTO DotNetMetrics(Value, Time) VALUES ({item.Value}, {item.Time.ToUnixTimeSeconds()})";
-            command.ExecuteNonQuery();
+            connection.Execute("INSERT INTO DotNetMetrics(Value, Time) VALUES (@Value, @Time)",
+                new
+                {
+                    item.Value,
+                    Time = item.Time.ToUnixTimeSeconds()
+                });
         }
 
         public IList<DotNetMetric> GetByPeriod(DateTimeOffset fromTime, DateTimeOffset toTime)
         {
             using var connection = _connectionManager.CreateOpenedConnection();
 
-            using var command = new SQLiteCommand(connection);
-            command.CommandText = $"SELECT Id, Value, Time FROM DotNetMetrics WHERE Time >= {fromTime.ToUnixTimeSeconds()} AND Time <= {toTime.ToUnixTimeSeconds()}";
-
-            var result = new List<DotNetMetric>();
-
-            using (var reader = command.ExecuteReader())
-            {
-                while(reader.Read())
+            var result = connection.Query<DotNetMetric>("SELECT Id, Value, Time FROM DotNetMetrics WHERE Time >= @FromTime AND Time <= @ToTime",
+                new
                 {
-                    result.Add(new DotNetMetric
-                    {
-                        Id = reader.GetInt32(0),
-                        Value = reader.GetInt32(1),
-                        Time = DateTimeOffset.FromUnixTimeSeconds(reader.GetInt64(2)).ToOffset(TimeZoneInfo.Local.BaseUtcOffset)
-                    });
-                }
-            }
+                    FromTime = fromTime.ToUnixTimeSeconds(),
+                    ToTime = toTime.ToUnixTimeSeconds()
+                }).ToList();
 
             return result;
         }

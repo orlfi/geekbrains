@@ -10,11 +10,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using MetricsAgent.DAL.Repositories;
 using MetricsAgent.DAL.Interfaces;
 using MetricsAgent.DAL;
 using Core.Interfaces;
 using System.Data.SQLite;
+using MediatR;
+using MetricsAgent.Features.Mappers;
+using Dapper;
 
 namespace MetricsAgent
 {
@@ -44,8 +48,19 @@ namespace MetricsAgent
             services.AddScoped<IRamMetricsRepository, RamMetricsRepository>();
             services.AddScoped<INetworkMetricsRepository, NetworkMetricsRepository>();
             services.AddSingleton<IConnectionManager>(_connectionManager);
+            services.AddMediatR(Assembly.GetExecutingAssembly());
+            services.AddSingleton<INetworkMetricsRepository, NetworkMetricsRepository>();
+            services.AddMapper();
 
+            ConfigureDapperMapper();
             ConfigureSqlLiteConnection();
+        }
+
+        private void ConfigureDapperMapper()
+        {
+            SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
+            SqlMapper.RemoveTypeMap(typeof(DateTimeOffset));
+            SqlMapper.RemoveTypeMap(typeof(DateTimeOffset?));
         }
 
         private void ConfigureSqlLiteConnection()
@@ -75,7 +90,6 @@ namespace MetricsAgent
                 {
                     InitializeTableWithData(item, month++, command);
                 }
-
             }
         }
 
