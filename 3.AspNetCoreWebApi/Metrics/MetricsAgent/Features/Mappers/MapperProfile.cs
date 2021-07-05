@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using MetricsAgent.DAL.Models;
-using MetricsAgent.Requests;
 using MetricsAgent.Responses;
+using MetricsAgent.Features.Commands;
 
 namespace MetricsAgent.Features.Mappers
 {
@@ -14,19 +14,19 @@ namespace MetricsAgent.Features.Mappers
         public MapperProfile()
         {
             CreateMap<CpuMetric, CpuMetricDto>();
-            CreateMap<CpuMetricCreateRequest, CpuMetric>();
+            CreateMap<CpuMetricCreateCommand, CpuMetric>();
 
             CreateMap<RamMetric, RamMetricDto>();
-            CreateMap<RamMetricCreateRequest, RamMetric>();
+            CreateMap<RamMetricCreateCommand, RamMetric>();
 
             CreateMap<NetworkMetric, NetworkMetricDto>();
-            CreateMap<NetworkMetricCreateRequest, NetworkMetric>();
+            CreateMap<NetworkMetricCreateCommand, NetworkMetric>();
 
             CreateMap<HddMetric, HddMetricDto>();
-            CreateMap<HddMetricCreateRequest, HddMetric>();
+            CreateMap<HddMetricCreateCommand, HddMetric>();
 
             CreateMap<DotNetMetric, DotNetMetricDto>();
-            CreateMap<DotNetMetricCreateRequest, DotNetMetric>();
+            CreateMap<DotNetMetricCreateCommand, DotNetMetric>();
         }
     }
 }

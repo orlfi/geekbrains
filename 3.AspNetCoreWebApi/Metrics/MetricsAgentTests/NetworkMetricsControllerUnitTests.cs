@@ -1,60 +1,73 @@
 using System;
-using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 using MetricsAgent.Controllers;
-using MetricsAgent.DAL.Models;
-using MetricsAgent.DAL.Interfaces;
-using MetricsAgent.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Microsoft.Extensions.Logging;
+using MediatR;
+using MetricsAgent.Features.Queries;
+using MetricsAgent.Responses;
+using MetricsAgent.Features.Commands;
 
 namespace MetricsAgentTests
 {
     public class NetworkMetricsControllerUnitTests
     {
-        private readonly Mock<INetworkMetricsRepository> _mockRepository;
+        private readonly Mock<IMediator> _mockMediator;
         private readonly Mock<ILogger<NetworkMetricsController>> _mockLogger;
         private readonly NetworkMetricsController _controller;
 
         public NetworkMetricsControllerUnitTests()
         {
-            _mockRepository = new Mock<INetworkMetricsRepository>();
             _mockLogger = new Mock<ILogger<NetworkMetricsController>>();
-            _controller = new NetworkMetricsController(_mockRepository.Object, _mockLogger.Object);
+            _mockMediator = new Mock<IMediator>();
+            _controller = new NetworkMetricsController(_mockLogger.Object, _mockMediator.Object);
         }
 
         [Fact]
         public void GetMetricsByPeriod_ReturnOk()
         {
-            var fromTime = DateTimeOffset.Now.AddDays(-5);
-            var toTime = DateTimeOffset.Now;
-            var metrics = new List<NetworkMetric>
+            var request = new NetworkMetricGetByPeriodQuery()
             {
-                new NetworkMetric {Id = 1, Value = 10, Time = DateTimeOffset.Now.AddDays(-5)},
-                new NetworkMetric {Id = 1, Value = 50, Time = DateTimeOffset.Now.AddDays(-4)}
+                FromTime = DateTimeOffset.Now.AddDays(-5),
+                ToTime = DateTimeOffset.Now
             };
-            _mockRepository.Setup(repository => repository.GetByPeriod(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>())).Returns(metrics);
+            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<NetworkMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new NetworkMetricResponse());
 
-            var result = _controller.GetMetricsByPeriod(fromTime, toTime);
+            var result = _controller.GetMetricsByPeriod(request);
 
-            Assert.IsAssignableFrom<IActionResult>(result);
+            Assert.IsAssignableFrom<Task<IActionResult>>(result);
         }
 
         [Fact]
+        public void GetMetricsByPeriod_ShouldCall_MediatorSend()
+        {
+            var request = new NetworkMetricGetByPeriodQuery()
+            {
+                FromTime = DateTimeOffset.Now.AddDays(-5),
+                ToTime = DateTimeOffset.Now
+            };
+            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<NetworkMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new NetworkMetricResponse());
+
+            _ = _controller.GetMetricsByPeriod(request);
+
+            _mockMediator.Verify(mediator =>  mediator.Send(It.IsAny<NetworkMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce());
+        }
+        
+        [Fact]
         public void GetMetricsByPeriod_ShouldCall_LogInformation()
         {
-            var fromTime = DateTimeOffset.Now.AddDays(-5);
-            var toTime = DateTimeOffset.Now;
-            var metrics = new List<NetworkMetric>
+            var request = new NetworkMetricGetByPeriodQuery()
             {
-                new NetworkMetric {Id = 1, Value = 10, Time = DateTimeOffset.Now.AddDays(-5)},
-                new NetworkMetric {Id = 1, Value = 50, Time = DateTimeOffset.Now.AddDays(-4)}
+                FromTime = DateTimeOffset.Now.AddDays(-5),
+                ToTime = DateTimeOffset.Now
             };
-            _mockRepository.Setup(repository => repository.GetByPeriod(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>())).Returns(metrics);
-            var logText = $"Parameters: fromTime={fromTime} toTime={toTime}";
+            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<NetworkMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new NetworkMetricResponse());
+            var logText = $"Parameters: FromTime={request.FromTime} ToTime={request.ToTime}";
 
-            _controller.GetMetricsByPeriod(fromTime, toTime);
+            _ = _controller.GetMetricsByPeriod(request);
 
             _mockLogger.Verify(
                 x => x.Log(
@@ -68,53 +81,57 @@ namespace MetricsAgentTests
         [Fact]
         public void Create_ReturnOk()
         {
-            var request = new NetworkMetricCreateRequest
+            var request = new NetworkMetricCreateCommand
             {
                 Value = 50,
                 Time = DateTimeOffset.Now.AddDays(-5)
             };
+            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<NetworkMetricCreateCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Value);
 
             var result = _controller.Create(request);
             
-            Assert.IsAssignableFrom<IActionResult>(result);
+            Assert.IsAssignableFrom<Task<IActionResult>>(result);
         }
         
         [Fact]
         public void Create_ShouldCall_Create_From_Repository()
         {
-            var request = new NetworkMetricCreateRequest
+            var request = new NetworkMetricCreateCommand
             {
                 Value = 50,
                 Time = DateTimeOffset.Now.AddDays(-5)
             };
+            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<NetworkMetricCreateCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Value);
 
             var result = _controller.Create(request);
 
-            _mockRepository.Verify(repository => repository.Create(It.IsAny<NetworkMetric>()), Times.AtLeastOnce());
+            _mockMediator.Verify(mediator =>  mediator.Send(It.IsAny<NetworkMetricCreateCommand>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce());
         }
 
         [Fact]
         public void Create_ShouldNotCall_Create_From_Repository_If_Value_Not_Between_0_100()
         {
-            var request = new NetworkMetricCreateRequest
+            var request = new NetworkMetricCreateCommand
             {
                 Value = 500,
                 Time = DateTimeOffset.Now.AddDays(-5)
             };
+            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<NetworkMetricCreateCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Value);
 
             var result = _controller.Create(request);
 
-            _mockRepository.Verify(repository => repository.Create(It.IsAny<NetworkMetric>()), Times.Never());
+            _mockMediator.Verify(mediator =>  mediator.Send(It.IsAny<NetworkMetricCreateCommand>(), It.IsAny<CancellationToken>()), Times.Never());
         }
 
         [Fact]
         public void Create_ShouldCall_LogInformation()
         {
-            var request = new NetworkMetricCreateRequest
+            var request = new NetworkMetricCreateCommand
             {
                 Value = 50,
                 Time = DateTimeOffset.Now.AddDays(-5)
             };
+            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<NetworkMetricCreateCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Value);
             var logText = $"Parameters: request={request}";
 
             var result = _controller.Create(request);

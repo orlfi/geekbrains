@@ -22,7 +22,7 @@ namespace MetricsAgent.DAL.Repositories
                 new
                 {
                     item.Value,
-                    Time = item.Time.ToUnixTimeSeconds()
+                    item.Time
                 });
         }
 
@@ -33,8 +33,8 @@ namespace MetricsAgent.DAL.Repositories
             var result = connection.Query<DotNetMetric>("SELECT Id, Value, Time FROM DotNetMetrics WHERE Time >= @FromTime AND Time <= @ToTime",
                 new
                 {
-                    FromTime = fromTime.ToUnixTimeSeconds(),
-                    ToTime = toTime.ToUnixTimeSeconds()
+                    FromTime = fromTime,
+                    ToTime = toTime
                 }).ToList();
 
             return result;
