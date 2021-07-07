@@ -18,7 +18,12 @@ using Core.Interfaces;
 using System.Data.SQLite;
 using MediatR;
 using MetricsAgent.Features.Mappers;
+using MetricsAgent.Jobs;
+using MetricsAgent.Services;
 using Dapper;
+using Quartz;
+using Quartz.Spi;
+using Quartz.Impl;
 
 namespace MetricsAgent
 {
@@ -42,17 +47,21 @@ namespace MetricsAgent
             _connectionManager = new ConnectionManager(Configuration);
 
             services.AddControllers();
-            services.AddScoped<ICpuMetricsRepository, CpuMetricsRepository>();
-            services.AddScoped<IDotNetMetricsRepository, DotNetMetricsRepository>();
-            services.AddScoped<IHddMetricsRepository, HddMetricsRepository>();
-            services.AddScoped<IRamMetricsRepository, RamMetricsRepository>();
-            services.AddScoped<INetworkMetricsRepository, NetworkMetricsRepository>();
+            services.AddSingleton<ICpuMetricsRepository, CpuMetricsRepository>();
+            services.AddSingleton<IDotNetMetricsRepository, DotNetMetricsRepository>();
+            services.AddSingleton<IHddMetricsRepository, HddMetricsRepository>();
+            services.AddSingleton<IRamMetricsRepository, RamMetricsRepository>();
+            services.AddSingleton<INetworkMetricsRepository, NetworkMetricsRepository>();
             services.AddSingleton<IConnectionManager>(_connectionManager);
             services.AddMediatR(Assembly.GetExecutingAssembly());
             services.AddSingleton<INetworkMetricsRepository, NetworkMetricsRepository>();
             services.AddMapper();
-            
-            services.AddHostedService
+
+            services.AddSingleton<IJobFactory, SingletonJobFactory>();
+            services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+            services.AddSingleton<CpuMetricJob>();
+            services.AddSingleton(new JobSchedule(typeof(CpuMetricJob),"0/5 * * * * ?"));
+            services.AddHostedService<QuartsHostedService>();
 
             ConfigureDapperMapper();
             ConfigureSqlLiteConnection();
