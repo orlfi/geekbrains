@@ -51,6 +51,8 @@ namespace MetricsAgent
             services.AddMediatR(Assembly.GetExecutingAssembly());
             services.AddSingleton<INetworkMetricsRepository, NetworkMetricsRepository>();
             services.AddMapper();
+            
+            services.AddHostedService
 
             ConfigureDapperMapper();
             ConfigureSqlLiteConnection();
