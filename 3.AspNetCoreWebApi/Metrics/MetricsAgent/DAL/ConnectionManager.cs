@@ -14,9 +14,9 @@ namespace MetricsAgent.DAL
                 
         public SQLiteConnection CreateOpenedConnection()
         {
-            var connction = new SQLiteConnection(_configuration.GetConnectionString("SqlLiteMetricsDatabase"));
-            connction.Open();
-            return connction;                
+            var connection = new SQLiteConnection(_configuration.GetConnectionString("SqlLiteMetricsDatabase"));
+            connection.Open();
+            return connection;                
         }
     }
 }
