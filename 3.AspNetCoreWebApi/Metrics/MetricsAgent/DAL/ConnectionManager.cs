@@ -9,8 +9,9 @@ namespace MetricsAgent.DAL
     {
         private readonly IConfiguration _configuration;
         
+        public string ConnectionString => _configuration.GetConnectionString("SqlLiteMetricsDatabase");
         public ConnectionManager(IConfiguration configuration) => _configuration = configuration;
-        
+                
         public SQLiteConnection CreateOpenedConnection()
         {
             var connction = new SQLiteConnection(_configuration.GetConnectionString("SqlLiteMetricsDatabase"));

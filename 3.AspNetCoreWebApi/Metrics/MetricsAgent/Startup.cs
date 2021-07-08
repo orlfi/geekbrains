@@ -24,6 +24,7 @@ using Dapper;
 using Quartz;
 using Quartz.Spi;
 using Quartz.Impl;
+using FluentMigrator.Runner;
 
 namespace MetricsAgent
 {
@@ -60,65 +61,26 @@ namespace MetricsAgent
             services.AddSingleton<IJobFactory, SingletonJobFactory>();
             services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
             services.AddSingleton<CpuMetricJob>();
-            services.AddSingleton(new JobSchedule(typeof(CpuMetricJob),"0/5 * * * * ?"));
+            services.AddSingleton(new JobSchedule(typeof(CpuMetricJob), "0/5 * * * * ?"));
             services.AddHostedService<QuartsHostedService>();
 
             ConfigureDapperMapper();
-            ConfigureSqlLiteConnection();
-        }
 
-        private void ConfigureDapperMapper()
-        {
-            SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
-            SqlMapper.RemoveTypeMap(typeof(DateTimeOffset));
-            SqlMapper.RemoveTypeMap(typeof(DateTimeOffset?));
-        }
+            services.AddFluentMigratorCore()
+                .ConfigureRunner(rb => rb
+                    // добавляем поддержку SQLite 
+                    .AddSQLite()
+                    // устанавливаем строку подключения
+                    .WithGlobalConnectionString(_connectionManager.ConnectionString)
+                    // подсказываем где искать классы с миграциями
+                    .ScanIn(typeof(Startup).Assembly).For.Migrations()
+                ).AddLogging(lb => lb
+                    .AddFluentMigratorConsole());
 
-        private void ConfigureSqlLiteConnection()
-        {
-            using var connection = _connectionManager.CreateOpenedConnection();
-            PrepareSchema(connection);
-        }
-
-        private void PrepareSchema(SQLiteConnection connection)
-        {
-            using var command = new SQLiteCommand(connection);
-            int month = 6;
-            foreach (var item in _tableNames)
-            {
-                var initializeWithDataFlag = Configuration.GetValue<bool>("InitializeWithData");
-                if (initializeWithDataFlag)
-                {
-                    command.CommandText = $"DROP TABLE IF EXISTS {item}";
-                    command.ExecuteNonQuery();
-
-                }
-
-                command.CommandText = $"CREATE TABLE IF NOT EXISTS {item}(Id INTEGER PRIMARY KEY, Value INT, Time INTEGER)";
-                command.ExecuteNonQuery();
-
-                if (initializeWithDataFlag)
-                {
-                    InitializeTableWithData(item, month++, command);
-                }
-            }
-        }
-
-        private void InitializeTableWithData(string tableName, int month, SQLiteCommand command)
-        {
-            Random rnd = new Random();
-            var time = new DateTimeOffset(2021, month, DateTimeOffset.Now.Date.Day, DateTimeOffset.Now.Hour, 0, 0, TimeSpan.FromHours(3));
-            for (int i = 0; i < initRowCount; i++)
-            {
-                var value = rnd.Next(1, 10) * 10;
-                command.CommandText = $"INSERT INTO {tableName}(Value, Time) VALUES ({value}, {time.ToUnixTimeSeconds()})";
-                command.ExecuteNonQuery();
-                time = time.AddMinutes(10);
-            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IMigrationRunner migrationRunner)
         {
             if (env.IsDevelopment())
             {
@@ -135,6 +97,15 @@ namespace MetricsAgent
             {
                 endpoints.MapControllers();
             });
+
+            migrationRunner.MigrateUp();
+        }
+
+        private void ConfigureDapperMapper()
+        {
+            SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
+            SqlMapper.RemoveTypeMap(typeof(DateTimeOffset));
+            SqlMapper.RemoveTypeMap(typeof(DateTimeOffset?));
         }
     }
 }
