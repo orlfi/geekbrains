@@ -16,7 +16,7 @@ namespace MetricsAgent.DAL.Repositories
 
         public void Create(RamMetric item)
         {
-            using var connection = _connectionManager.CreateOpenedConnection();
+            var connection = _connectionManager.GetOpenedConnection();
 
             connection.Execute("INSERT INTO RamMetrics(Value, Time) VALUES (@Value, @Time)",
                 new
@@ -28,7 +28,7 @@ namespace MetricsAgent.DAL.Repositories
 
         public IList<RamMetric> GetByPeriod(DateTimeOffset fromTime, DateTimeOffset toTime)
         {
-            using var connection = _connectionManager.CreateOpenedConnection();
+            var connection = _connectionManager.GetOpenedConnection();
 
             var result = connection.Query<RamMetric>("SELECT Id, Value, Time FROM RamMetrics WHERE Time >= @FromTime AND Time <= @ToTime",
                 new

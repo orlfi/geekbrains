@@ -15,7 +15,7 @@ namespace MetricsAgent.DAL.Repositories
 
         public void Create(CpuMetric item)
         {
-            using var connection = _connectionManager.CreateOpenedConnection();
+            var connection = _connectionManager.GetOpenedConnection();
             connection.Execute("INSERT INTO CpuMetrics(Value, Time) VALUES (@Value, @Time)",
                 new
                 {
@@ -26,7 +26,7 @@ namespace MetricsAgent.DAL.Repositories
 
         public IList<CpuMetric> GetByPeriod(DateTimeOffset fromTime, DateTimeOffset toTime)
         {
-            using var connection = _connectionManager.CreateOpenedConnection();
+            var connection = _connectionManager.GetOpenedConnection();
 
             var result = connection.Query<CpuMetric>("SELECT Id, Value, Time FROM CpuMetrics WHERE Time >= @FromTime AND Time <= @ToTime",
                 new

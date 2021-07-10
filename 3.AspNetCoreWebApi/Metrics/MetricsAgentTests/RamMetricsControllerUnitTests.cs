@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -9,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using MediatR;
 using MetricsAgent.Features.Queries;
 using MetricsAgent.Responses;
-using MetricsAgent.Features.Commands;
 
 namespace MetricsAgentTests
 {
@@ -27,35 +27,40 @@ namespace MetricsAgentTests
         }
 
         [Fact]
-        public void GetMetricsByPeriod_ReturnOk()
+        public async Task GetMetricsByPeriod_ReturnOk()
         {
             var request = new RamMetricGetByPeriodQuery()
             {
                 FromTime = DateTimeOffset.Now.AddDays(-5),
                 ToTime = DateTimeOffset.Now
             };
-            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<RamMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new RamMetricResponse());
+            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<RamMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new RamMetricResponse()
+                {
+                    Metrics = new List<RamMetricDto>()
+                    {
+                       new RamMetricDto()
+                       {
+                           Id = 1,
+                           Time = DateTimeOffset.Now,
+                           Value = 99
+                       }
+                    }
+                });
 
-            var result = _controller.GetMetricsByPeriod(request);
+            var result = await _controller.GetMetricsByPeriod(request);
+            var resultValue = ((OkObjectResult)result).Value as RamMetricResponse;
 
-            Assert.IsAssignableFrom<Task<IActionResult>>(result);
+            _mockMediator.Verify(mediator => mediator.Send(It.Is<RamMetricGetByPeriodQuery>(
+                m => m.FromTime == request.FromTime && m.ToTime == request.ToTime),
+                It.IsAny<CancellationToken>()), Times.Once);
+            _mockMediator.Verify(mediator => mediator.Send(It.IsAny<RamMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+            Assert.Single(resultValue.Metrics);
+            Assert.Equal(1, resultValue.Metrics[0].Id);
+            Assert.Equal(99, resultValue.Metrics[0].Value);
+            Assert.IsAssignableFrom<IActionResult>(result);
         }
 
-        [Fact]
-        public void GetMetricsByPeriod_ShouldCall_MediatorSend()
-        {
-            var request = new RamMetricGetByPeriodQuery()
-            {
-                FromTime = DateTimeOffset.Now.AddDays(-5),
-                ToTime = DateTimeOffset.Now
-            };
-            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<RamMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new RamMetricResponse());
-
-            _ = _controller.GetMetricsByPeriod(request);
-
-            _mockMediator.Verify(mediator =>  mediator.Send(It.IsAny<RamMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce());
-        }
-        
         [Fact]
         public void GetMetricsByPeriod_ShouldCall_LogInformation()
         {
@@ -76,73 +81,6 @@ namespace MetricsAgentTests
                 It.Is<It.IsAnyType>((v, t) => v.ToString().CompareTo(logText) == 0),
                 It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
-        }
-
-        [Fact]
-        public void Create_ReturnOk()
-        {
-            var request = new RamMetricCreateCommand
-            {
-                Value = 50,
-                Time = DateTimeOffset.Now.AddDays(-5)
-            };
-            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<RamMetricCreateCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Value);
-
-            var result = _controller.Create(request);
-            
-            Assert.IsAssignableFrom<Task<IActionResult>>(result);
-        }
-        
-        [Fact]
-        public void Create_ShouldCall_Create_From_Repository()
-        {
-            var request = new RamMetricCreateCommand
-            {
-                Value = 50,
-                Time = DateTimeOffset.Now.AddDays(-5)
-            };
-            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<RamMetricCreateCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Value);
-
-            var result = _controller.Create(request);
-
-            _mockMediator.Verify(mediator =>  mediator.Send(It.IsAny<RamMetricCreateCommand>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce());
-        }
-
-        [Fact]
-        public void Create_ShouldNotCall_Create_From_Repository_If_Value_Not_Between_0_100()
-        {
-            var request = new RamMetricCreateCommand
-            {
-                Value = 500,
-                Time = DateTimeOffset.Now.AddDays(-5)
-            };
-            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<RamMetricCreateCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Value);
-
-            var result = _controller.Create(request);
-
-            _mockMediator.Verify(mediator =>  mediator.Send(It.IsAny<RamMetricCreateCommand>(), It.IsAny<CancellationToken>()), Times.Never());
-        }
-
-        [Fact]
-        public void Create_ShouldCall_LogInformation()
-        {
-            var request = new RamMetricCreateCommand
-            {
-                Value = 50,
-                Time = DateTimeOffset.Now.AddDays(-5)
-            };
-            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<RamMetricCreateCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Value);
-            var logText = $"Parameters: request={request}";
-
-            var result = _controller.Create(request);
-
-            _mockLogger.Verify(
-                logger => logger.Log(
-                    It.Is<LogLevel>(l => l == LogLevel.Information),
-                    It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v.ToString().CompareTo(logText) == 0),
-                    It.IsAny<Exception>(),
-                    It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
         }
     }
 }

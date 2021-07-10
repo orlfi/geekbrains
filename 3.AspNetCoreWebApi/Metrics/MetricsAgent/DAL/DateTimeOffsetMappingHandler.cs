@@ -7,7 +7,7 @@ using Dapper;
 
 namespace MetricsAgent.DAL
 {
-    public class DateTimeOffsetHandler : SqlMapper.TypeHandler<DateTimeOffset>
+    public class DateTimeOffsetMappingHandler : SqlMapper.TypeHandler<DateTimeOffset>
     {
         public override DateTimeOffset Parse(object value) =>
             DateTimeOffset.FromUnixTimeSeconds((long)value).ToOffset(TimeZoneInfo.Local.BaseUtcOffset);

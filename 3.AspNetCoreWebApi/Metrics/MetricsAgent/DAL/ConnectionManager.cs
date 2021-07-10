@@ -8,15 +8,23 @@ namespace MetricsAgent.DAL
     public class ConnectionManager : IConnectionManager
     {
         private readonly IConfiguration _configuration;
-        
+        SQLiteConnection _connection = null;
+        private readonly object locker = new object();
+
         public string ConnectionString => _configuration.GetConnectionString("SqlLiteMetricsDatabase");
         public ConnectionManager(IConfiguration configuration) => _configuration = configuration;
                 
-        public SQLiteConnection CreateOpenedConnection()
+        public SQLiteConnection GetOpenedConnection()
         {
-            var connection = new SQLiteConnection(_configuration.GetConnectionString("SqlLiteMetricsDatabase"));
-            connection.Open();
-            return connection;                
+            lock (locker)
+            {
+                if (_connection == null)
+                {
+                    _connection = new SQLiteConnection(_configuration.GetConnectionString("SqlLiteMetricsDatabase"));
+                    _connection.Open();
+                }
+            }
+            return _connection;                
         }
     }
 }

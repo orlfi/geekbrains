@@ -61,7 +61,15 @@ namespace MetricsAgent
             services.AddSingleton<IJobFactory, SingletonJobFactory>();
             services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
             services.AddSingleton<CpuMetricJob>();
+            services.AddSingleton<DotNetMetricJob>();
+            services.AddSingleton<HddMetricJob>();
+            services.AddSingleton<NetworkMetricJob>();
+            services.AddSingleton<RamMetricJob>();
             services.AddSingleton(new JobSchedule(typeof(CpuMetricJob), "0/5 * * * * ?"));
+            services.AddSingleton(new JobSchedule(typeof(DotNetMetricJob), "0/5 * * * * ?"));
+            services.AddSingleton(new JobSchedule(typeof(HddMetricJob), "0/5 * * * * ?"));
+            services.AddSingleton(new JobSchedule(typeof(NetworkMetricJob), "0/5 * * * * ?"));
+            services.AddSingleton(new JobSchedule(typeof(RamMetricJob), "0/5 * * * * ?"));
             services.AddHostedService<QuartsHostedService>();
 
             ConfigureDapperMapper();
@@ -103,7 +111,7 @@ namespace MetricsAgent
 
         private void ConfigureDapperMapper()
         {
-            SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
+            SqlMapper.AddTypeHandler(new DateTimeOffsetMappingHandler());
             SqlMapper.RemoveTypeMap(typeof(DateTimeOffset));
             SqlMapper.RemoveTypeMap(typeof(DateTimeOffset?));
         }

@@ -8,6 +8,6 @@ namespace Core.Interfaces
     public interface IConnectionManager
     {
         string ConnectionString { get;}
-        SQLiteConnection CreateOpenedConnection();
+        SQLiteConnection GetOpenedConnection();
     }
 }

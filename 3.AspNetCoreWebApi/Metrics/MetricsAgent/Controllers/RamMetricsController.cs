@@ -10,7 +10,6 @@ using MetricsAgent.DAL.Models;
 using MetricsAgent.Responses;
 using AutoMapper;
 using MetricsAgent.Features.Queries;
-using MetricsAgent.Features.Commands;
 using MediatR;
 
 namespace MetricsAgent.Controllers
@@ -38,19 +37,6 @@ namespace MetricsAgent.Controllers
             var response = await _mediator.Send(request);
             
             return Ok(response);
-        }
-
-        [HttpPost("create")]
-        public async Task<IActionResult> Create([FromBody] RamMetricCreateCommand request)
-        {
-            _logger.LogInformation($"Parameters: request={request}");
-
-            if (request.Value < 0 || request.Value > 100)
-                return BadRequest("The Value must be in the range from 0 to 100");
-
-            await _mediator.Send(request);
-
-            return Ok();
         }
     }
 }
