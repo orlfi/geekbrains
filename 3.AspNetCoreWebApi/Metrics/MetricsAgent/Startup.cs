@@ -1,21 +1,14 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Reflection;
 using MetricsAgent.DAL.Repositories;
 using MetricsAgent.DAL.Interfaces;
 using MetricsAgent.DAL;
 using Core.Interfaces;
-using System.Data.SQLite;
 using MediatR;
 using MetricsAgent.Features.Mappers;
 using MetricsAgent.Jobs;
@@ -30,9 +23,6 @@ namespace MetricsAgent
 {
     public class Startup
     {
-        private readonly string[] _tableNames = { "CpuMetrics", "DotNetMetrics", "RamMetrics", "NetworkMetrics", "HddMetrics" };
-
-        private const int initRowCount = 10;
         public IConnectionManager _connectionManager;
 
         public Startup(IConfiguration configuration)
@@ -53,7 +43,7 @@ namespace MetricsAgent
             services.AddSingleton<IHddMetricsRepository, HddMetricsRepository>();
             services.AddSingleton<IRamMetricsRepository, RamMetricsRepository>();
             services.AddSingleton<INetworkMetricsRepository, NetworkMetricsRepository>();
-            services.AddSingleton<IConnectionManager>(_connectionManager);
+            services.AddSingleton(_connectionManager);
             services.AddMediatR(Assembly.GetExecutingAssembly());
             services.AddSingleton<INetworkMetricsRepository, NetworkMetricsRepository>();
             services.AddMapper();
@@ -72,7 +62,7 @@ namespace MetricsAgent
             services.AddSingleton(new JobSchedule(typeof(RamMetricJob), "0/5 * * * * ?"));
             services.AddHostedService<QuartsHostedService>();
 
-            ConfigureDapperMapper();
+            ConfigureDapperMapperForDateTimeOffset();
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(rb => rb
@@ -109,7 +99,7 @@ namespace MetricsAgent
             migrationRunner.MigrateUp();
         }
 
-        private void ConfigureDapperMapper()
+        private void ConfigureDapperMapperForDateTimeOffset()
         {
             SqlMapper.AddTypeHandler(new DateTimeOffsetMappingHandler());
             SqlMapper.RemoveTypeMap(typeof(DateTimeOffset));
