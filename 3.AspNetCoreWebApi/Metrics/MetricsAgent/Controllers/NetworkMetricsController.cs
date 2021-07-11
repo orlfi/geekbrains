@@ -1,14 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MetricsAgent.DAL.Interfaces;
-using MetricsAgent.DAL.Models;
-using MetricsAgent.DAL.Requests;
-using MetricsAgent.DAL.Responses;
+using AutoMapper;
+using MetricsAgent.Features.Queries;
+using MetricsAgent.Features.Commands;
+using MediatR;
 
 namespace MetricsAgent.Controllers
 {
@@ -16,55 +12,36 @@ namespace MetricsAgent.Controllers
     [ApiController]
     public class NetworkMetricsController : ControllerBase
     {
-        private readonly INetworkMetricsRepository _repository;
         private readonly ILogger<NetworkMetricsController> _logger;
+        private readonly IMediator _mediator;
 
-        public NetworkMetricsController(INetworkMetricsRepository repository, ILogger<NetworkMetricsController> logger)
+        public NetworkMetricsController(ILogger<NetworkMetricsController> logger, IMediator mediator)
         {
-            _repository = repository;
             _logger = logger;
+            _mediator = mediator;
 
             _logger.LogDebug(1, "Logger dependency injected to NetworkMetricsController");
         }
 
         [HttpGet("from/{fromTime}/to/{toTime}")]
-        public IActionResult GetMetricsByPeriod([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
+        public async Task<IActionResult> GetMetricsByPeriod([FromRoute] NetworkMetricGetByPeriodQuery request)
         {
-            _logger.LogInformation($"Parameters: fromTime={fromTime} toTime={toTime}");
-
-            var metricsList = _repository.GetByPeriod(fromTime, toTime);
-
-            var response = new NetworkMetricResponse();
-
-            foreach (var item in metricsList)
-            {
-
-                response.Metrics.Add(new NetworkMetricDTO
-                {
-                    Id = item.Id,
-                    Value = item.Value,
-                    Time = item.Time
-                });
-            }
-
+            _logger.LogInformation($"Parameters: {request}");
+            
+            var response = await _mediator.Send(request);
+            
             return Ok(response);
         }
         
         [HttpPost("create")]
-        public IActionResult Create([FromBody] NetworkMetricCreateRequest request)
+        public async Task<IActionResult> Create([FromBody] NetworkMetricCreateCommand request)
         {
             _logger.LogInformation($"Parameters: request={request}");
 
             if (request.Value < 0 || request.Value > 100)
                 return BadRequest("The Value must be in the range from 0 to 100");
 
-            NetworkMetric metric = new NetworkMetric()
-            {
-                Value = request.Value,
-                Time = request.Time
-            };
-
-            _repository.Create(metric);
+            await _mediator.Send(request);
 
             return Ok();
         }

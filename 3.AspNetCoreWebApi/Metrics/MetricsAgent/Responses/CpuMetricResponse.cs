@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MetricsAgent.DAL.Responses
+namespace MetricsAgent.Responses
 {
     public class CpuMetricResponse
     {
-        public List<CpuMetricDTO> Metrics { get; set; } = new List<CpuMetricDTO>();
+        public List<CpuMetricDto> Metrics { get; set; } = new List<CpuMetricDto>();
     }
 }

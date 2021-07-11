@@ -1,14 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MetricsAgent.DAL.Interfaces;
-using MetricsAgent.DAL.Models;
-using MetricsAgent.DAL.Requests;
-using MetricsAgent.DAL.Responses;
+using MetricsAgent.Features.Queries;
+using MetricsAgent.Features.Commands;
+using MediatR;
 
 namespace MetricsAgent.Controllers
 {
@@ -16,55 +11,36 @@ namespace MetricsAgent.Controllers
     [ApiController]
     public class DotNetMetricsController : ControllerBase
     {
-        private readonly IDotNetMetricsRepository _repository;
         private readonly ILogger<DotNetMetricsController> _logger;
+        private readonly IMediator _mediator;
 
-        public DotNetMetricsController(IDotNetMetricsRepository repository, ILogger<DotNetMetricsController> logger)
+        public DotNetMetricsController(ILogger<DotNetMetricsController> logger, IMediator mediator)
         {
-            _repository = repository;
             _logger = logger;
+            _mediator = mediator;
 
             _logger.LogDebug(1, "Logger dependency injected to DotNetMetricsController");
         }
 
         [HttpGet("errors-count/from/{fromTime}/to/{toTime}")]
-        public IActionResult GetMetricsByPeriod([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
+        public async Task<IActionResult> GetMetricsByPeriod([FromRoute] DotNetMetricGetByPeriodQuery request)
         {
-            _logger.LogInformation($"Parameters: fromTime={fromTime} toTime={toTime}");
-
-            var metricsList = _repository.GetByPeriod(fromTime, toTime);
-
-            var response = new DotNetMetricResponse();
-
-            foreach (var item in metricsList)
-            {
-
-                response.Metrics.Add(new DotNetMetricDTO
-                {
-                    Id = item.Id,
-                    Value = item.Value,
-                    Time = item.Time
-                });
-            }
-
+            _logger.LogInformation($"Parameters: {request}");
+            
+            var response = await _mediator.Send(request);
+            
             return Ok(response);
         }
 
         [HttpPost("create")]
-        public IActionResult Create([FromBody] DotNetMetricCreateRequest request)
+        public async Task<IActionResult> Create([FromBody] DotNetMetricCreateCommand request)
         {
             _logger.LogInformation($"Parameters: request={request}");
 
             if (request.Value < 0)
                 return BadRequest("The Value must be greater than or equal to 0");
 
-            DotNetMetric metric = new DotNetMetric()
-            {
-                Value = request.Value,
-                Time = request.Time
-            };
-
-            _repository.Create(metric);
+            await _mediator.Send(request);
 
             return Ok();
         }

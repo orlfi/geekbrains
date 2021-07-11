@@ -1,54 +1,41 @@
 ﻿using System;
-using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
-using System.Text;
 using Core.Interfaces;
 using MetricsAgent.DAL.Interfaces;
 using MetricsAgent.DAL.Models;
-using System.Data.SQLite;
-
+using System.Linq;
+using Dapper;
 
 namespace MetricsAgent.DAL.Repositories
 {
     public class HddMetricsRepository : IHddMetricsRepository
     {
-        private readonly IConfiguration _configuration;
-        public HddMetricsRepository(IConfiguration configuration) => _configuration = configuration;
+        private readonly IConnectionManager _connectionManager;
+
+        public HddMetricsRepository(IConnectionManager connectionManager) => _connectionManager = connectionManager;
 
         public void Create(HddMetric item)
         {
-            var connectionString = _configuration.GetConnectionString("SqlLiteMetricsDatabase");
-            using var connection = new SQLiteConnection(connectionString);
-            connection.Open();
+            using var connection = _connectionManager.CreateOpenedConnection();
 
-            using var command = new SQLiteCommand(connection);
-            command.CommandText = $"INSERT INTO HddMetrics(Value, Time) VALUES ({item.Value}, {item.Time.ToUnixTimeSeconds()})";
-            command.ExecuteNonQuery();
+            connection.Execute("INSERT INTO HddMetrics(Value, Time) VALUES (@Value, @Time)",
+                new
+                {
+                    item.Value,
+                    Time = item.Time.ToUnixTimeSeconds()
+                });
         }
 
         public IList<HddMetric> GetByPeriod(DateTimeOffset fromTime, DateTimeOffset toTime)
         {
-            var connectionString = _configuration.GetConnectionString("SqlLiteMetricsDatabase");
-            using var connection = new SQLiteConnection(connectionString);
-            connection.Open();
+            using var connection = _connectionManager.CreateOpenedConnection();
 
-            using var command = new SQLiteCommand(connection);
-            command.CommandText = $"SELECT Id, Value, Time FROM HddMetrics WHERE Time >= {fromTime.ToUnixTimeSeconds()} AND Time <= {toTime.ToUnixTimeSeconds()}";
-
-            var result = new List<HddMetric>();
-
-            using (var reader = command.ExecuteReader())
-            {
-                while(reader.Read())
+            var result = connection.Query<HddMetric>("SELECT Id, Value, Time FROM HddMetrics WHERE Time >= @FromTime AND Time <= @ToTime",
+                new
                 {
-                    result.Add(new HddMetric
-                    {
-                        Id = reader.GetInt32(0),
-                        Value = reader.GetInt32(1),
-                        Time = DateTimeOffset.FromUnixTimeSeconds(reader.GetInt64(2)).ToOffset(TimeZoneInfo.Local.BaseUtcOffset)
-                    });
-                }
-            }
+                    FromTime = fromTime.ToUnixTimeSeconds(),
+                    ToTime = toTime.ToUnixTimeSeconds()
+                }).ToList();
 
             return result;
         }

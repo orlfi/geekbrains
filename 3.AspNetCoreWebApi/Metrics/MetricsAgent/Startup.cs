@@ -10,9 +10,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using MetricsAgent.DAL.Repositories;
 using MetricsAgent.DAL.Interfaces;
+using MetricsAgent.DAL;
+using Core.Interfaces;
 using System.Data.SQLite;
+using MediatR;
+using MetricsAgent.Features.Mappers;
+using Dapper;
 
 namespace MetricsAgent
 {
@@ -21,6 +27,7 @@ namespace MetricsAgent
         private readonly string[] _tableNames = { "CpuMetrics", "DotNetMetrics", "RamMetrics", "NetworkMetrics", "HddMetrics" };
 
         private const int initRowCount = 10;
+        public IConnectionManager _connectionManager;
 
         public Startup(IConfiguration configuration)
         {
@@ -32,20 +39,33 @@ namespace MetricsAgent
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            _connectionManager = new ConnectionManager(Configuration);
+
             services.AddControllers();
-            ConfigureSqlLiteConnection();
             services.AddScoped<ICpuMetricsRepository, CpuMetricsRepository>();
             services.AddScoped<IDotNetMetricsRepository, DotNetMetricsRepository>();
             services.AddScoped<IHddMetricsRepository, HddMetricsRepository>();
             services.AddScoped<IRamMetricsRepository, RamMetricsRepository>();
             services.AddScoped<INetworkMetricsRepository, NetworkMetricsRepository>();
+            services.AddSingleton<IConnectionManager>(_connectionManager);
+            services.AddMediatR(Assembly.GetExecutingAssembly());
+            services.AddSingleton<INetworkMetricsRepository, NetworkMetricsRepository>();
+            services.AddMapper();
+
+            ConfigureDapperMapper();
+            ConfigureSqlLiteConnection();
+        }
+
+        private void ConfigureDapperMapper()
+        {
+            SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
+            SqlMapper.RemoveTypeMap(typeof(DateTimeOffset));
+            SqlMapper.RemoveTypeMap(typeof(DateTimeOffset?));
         }
 
         private void ConfigureSqlLiteConnection()
         {
-            var connectionString = Configuration.GetConnectionString("SqlLiteMetricsDatabase");
-            using var connection = new SQLiteConnection(connectionString);
-            connection.Open();
+            using var connection = _connectionManager.CreateOpenedConnection();
             PrepareSchema(connection);
         }
 
@@ -70,7 +90,6 @@ namespace MetricsAgent
                 {
                     InitializeTableWithData(item, month++, command);
                 }
-
             }
         }
 

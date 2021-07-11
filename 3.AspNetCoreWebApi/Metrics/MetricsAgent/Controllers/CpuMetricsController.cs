@@ -5,10 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MetricsAgent.DAL.Interfaces;
-using MetricsAgent.DAL.Models;
-using MetricsAgent.DAL.Requests;
-using MetricsAgent.DAL.Responses;
+using MetricsAgent.Features.Queries;
+using MetricsAgent.Features.Commands;
+using MediatR;
 
 namespace MetricsAgent.Controllers
 {
@@ -16,55 +15,37 @@ namespace MetricsAgent.Controllers
     [ApiController]
     public class CpuMetricsController : ControllerBase
     {
-        private readonly ICpuMetricsRepository _repository;
         private readonly ILogger<CpuMetricsController> _logger;
-        
-        public CpuMetricsController(ICpuMetricsRepository repository, ILogger<CpuMetricsController> logger)
+        private readonly IMediator _mediator;
+
+        public CpuMetricsController(ILogger<CpuMetricsController> logger, IMediator mediator)
         {
-            _repository = repository;
             _logger = logger;
+            _mediator = mediator;
 
             _logger.LogDebug(1,"Logger dependency injected to CpuMetricsController");
         }
 
         [HttpGet("from/{fromTime}/to/{toTime}")]
-        public IActionResult GetMetricsByPeriod([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
+        public async Task<IActionResult> GetMetricsByPeriod([FromRoute] CpuMetricGetByPeriodQuery request)
         {
-            _logger.LogInformation($"Parameters: fromTime={fromTime} toTime={toTime}");
-
-            var metricsList = _repository.GetByPeriod(fromTime, toTime);
-
-            var response = new CpuMetricResponse();
-
-            foreach (var item in metricsList)
-            {
-
-                response.Metrics.Add(new CpuMetricDTO
-                {
-                    Id = item.Id,
-                    Value = item.Value,
-                    Time = item.Time
-                });
-            }
-
+            _logger.LogInformation($"Parameters: {request}");
+            
+            var response = await _mediator.Send(request);
+            
             return Ok(response);
         }
 
         [HttpPost("create")]
-        public IActionResult Create([FromBody] CpuMetricCreateRequest request)
+        public async Task<IActionResult> Create([FromBody] CpuMetricCreateCommand request)
         {
             _logger.LogInformation($"Parameters: request={request}");
 
+            //TODO Add FluentValidation?
             if (request.Value < 0 || request.Value > 100)
                 return BadRequest("The Value must be in the range from 0 to 100");
 
-            CpuMetric metric = new CpuMetric()
-            {
-                Value = request.Value,
-                Time = request.Time
-            };
-
-            _repository.Create(metric);
+            await _mediator.Send(request);
 
             return Ok();
         }

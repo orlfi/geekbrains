@@ -1,6 +1,7 @@
 {
     "dotnet-test-explorer.treeMode": "full",
     "cSpell.words": [
+        "Mediat",
         "Xunit",
         "nlog"
     ]

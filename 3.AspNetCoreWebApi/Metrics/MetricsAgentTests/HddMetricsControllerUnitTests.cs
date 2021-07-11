@@ -1,60 +1,73 @@
 using System;
-using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 using MetricsAgent.Controllers;
-using MetricsAgent.DAL.Models;
-using MetricsAgent.DAL.Interfaces;
-using MetricsAgent.DAL.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Microsoft.Extensions.Logging;
+using MediatR;
+using MetricsAgent.Features.Queries;
+using MetricsAgent.Responses;
+using MetricsAgent.Features.Commands;
 
 namespace MetricsAgentTests
 {
     public class HddMetricsControllerUnitTests
     {
-        private readonly Mock<IHddMetricsRepository> _mockRepository;
+        private readonly Mock<IMediator> _mockMediator;
         private readonly Mock<ILogger<HddMetricsController>> _mockLogger;
         private readonly HddMetricsController _controller;
 
         public HddMetricsControllerUnitTests()
         {
-            _mockRepository = new Mock<IHddMetricsRepository>();
             _mockLogger = new Mock<ILogger<HddMetricsController>>();
-            _controller = new HddMetricsController(_mockRepository.Object, _mockLogger.Object);
+            _mockMediator = new Mock<IMediator>();
+            _controller = new HddMetricsController(_mockLogger.Object, _mockMediator.Object);
         }
 
         [Fact]
         public void GetMetricsByPeriod_ReturnOk()
         {
-            var fromTime = DateTimeOffset.Now.AddDays(-5);
-            var toTime = DateTimeOffset.Now;
-            var metrics = new List<HddMetric>
+            var request = new HddMetricGetByPeriodQuery()
             {
-                new HddMetric {Id = 1, Value = 10, Time = DateTimeOffset.Now.AddDays(-5)},
-                new HddMetric {Id = 1, Value = 50, Time = DateTimeOffset.Now.AddDays(-4)}
+                FromTime = DateTimeOffset.Now.AddDays(-5),
+                ToTime = DateTimeOffset.Now
             };
-            _mockRepository.Setup(repository => repository.GetByPeriod(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>())).Returns(metrics);
+            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<HddMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new HddMetricResponse());
 
-            var result = _controller.GetMetricsByPeriod(fromTime, toTime);
+            var result = _controller.GetMetricsByPeriod(request);
 
-            Assert.IsAssignableFrom<IActionResult>(result);
+            Assert.IsAssignableFrom<Task<IActionResult>>(result);
         }
 
         [Fact]
+        public void GetMetricsByPeriod_ShouldCall_MediatorSend()
+        {
+            var request = new HddMetricGetByPeriodQuery()
+            {
+                FromTime = DateTimeOffset.Now.AddDays(-5),
+                ToTime = DateTimeOffset.Now
+            };
+            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<HddMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new HddMetricResponse());
+
+            _ = _controller.GetMetricsByPeriod(request);
+
+            _mockMediator.Verify(mediator =>  mediator.Send(It.IsAny<HddMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce());
+        }
+        
+        [Fact]
         public void GetMetricsByPeriod_ShouldCall_LogInformation()
         {
-            var fromTime = DateTimeOffset.Now.AddDays(-5);
-            var toTime = DateTimeOffset.Now;
-            var metrics = new List<HddMetric>
+            var request = new HddMetricGetByPeriodQuery()
             {
-                new HddMetric {Id = 1, Value = 10, Time = DateTimeOffset.Now.AddDays(-5)},
-                new HddMetric {Id = 1, Value = 50, Time = DateTimeOffset.Now.AddDays(-4)}
+                FromTime = DateTimeOffset.Now.AddDays(-5),
+                ToTime = DateTimeOffset.Now
             };
-            _mockRepository.Setup(repository => repository.GetByPeriod(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>())).Returns(metrics);
-            var logText = $"Parameters: fromTime={fromTime} toTime={toTime}";
+            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<HddMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new HddMetricResponse());
+            var logText = $"Parameters: FromTime={request.FromTime} ToTime={request.ToTime}";
 
-            _controller.GetMetricsByPeriod(fromTime, toTime);
+            _ = _controller.GetMetricsByPeriod(request);
 
             _mockLogger.Verify(
                 x => x.Log(
@@ -68,53 +81,57 @@ namespace MetricsAgentTests
         [Fact]
         public void Create_ReturnOk()
         {
-            var request = new HddMetricCreateRequest
+            var request = new HddMetricCreateCommand
             {
                 Value = 50,
                 Time = DateTimeOffset.Now.AddDays(-5)
             };
+            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<HddMetricCreateCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Value);
 
             var result = _controller.Create(request);
             
-            Assert.IsAssignableFrom<IActionResult>(result);
+            Assert.IsAssignableFrom<Task<IActionResult>>(result);
         }
         
         [Fact]
         public void Create_ShouldCall_Create_From_Repository()
         {
-            var request = new HddMetricCreateRequest
+            var request = new HddMetricCreateCommand
             {
                 Value = 50,
                 Time = DateTimeOffset.Now.AddDays(-5)
             };
+            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<HddMetricCreateCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Value);
 
             var result = _controller.Create(request);
 
-            _mockRepository.Verify(repository => repository.Create(It.IsAny<HddMetric>()), Times.AtLeastOnce());
+            _mockMediator.Verify(mediator =>  mediator.Send(It.IsAny<HddMetricCreateCommand>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce());
         }
 
         [Fact]
         public void Create_ShouldNotCall_Create_From_Repository_If_Value_Not_Between_0_100()
         {
-            var request = new HddMetricCreateRequest
+            var request = new HddMetricCreateCommand
             {
                 Value = 500,
                 Time = DateTimeOffset.Now.AddDays(-5)
             };
+            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<HddMetricCreateCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Value);
 
             var result = _controller.Create(request);
 
-            _mockRepository.Verify(repository => repository.Create(It.IsAny<HddMetric>()), Times.Never());
+            _mockMediator.Verify(mediator =>  mediator.Send(It.IsAny<HddMetricCreateCommand>(), It.IsAny<CancellationToken>()), Times.Never());
         }
 
         [Fact]
         public void Create_ShouldCall_LogInformation()
         {
-            var request = new HddMetricCreateRequest
+            var request = new HddMetricCreateCommand
             {
                 Value = 50,
                 Time = DateTimeOffset.Now.AddDays(-5)
             };
+            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<HddMetricCreateCommand>(), It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Value);
             var logText = $"Parameters: request={request}";
 
             var result = _controller.Create(request);
