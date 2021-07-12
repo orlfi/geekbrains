@@ -4,7 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using MetricsManager.DAL.Models;
-using MetricsManager.Responses;
+using MetricsManager.Responses.Metrics;
+using MetricsManager.Responses.Agents;
 
 namespace MetricsManager.Features.Mappers
 {
@@ -12,6 +13,8 @@ namespace MetricsManager.Features.Mappers
     {
         public MapperProfile()
         {
+            CreateMap<AgentInfo, AgentInfoDto>();
+
             CreateMap<CpuMetric, CpuMetricDto>();
 
             CreateMap<RamMetric, RamMetricDto>();

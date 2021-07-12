@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using MetricsManager.Responses;
+using MetricsManager.Responses.Metrics;
 using MetricsManager.DAL.Interfaces;
 
 using AutoMapper;
 
-namespace MetricsManager.Features.Queries
+namespace MetricsManager.Features.Queries.Metrics
 {
-    public class RamMetricGetByPeriodQuery : IRequest<RamMetricResponse>
+    public class HddMetricGetByPeriodQuery : IRequest<HddMetricResponse>
     {
         public DateTimeOffset FromTime { get; set; }
 
@@ -21,26 +21,26 @@ namespace MetricsManager.Features.Queries
             return $"FromTime={FromTime} ToTime={ToTime}";
         }
 
-        public class RamMetricGetByPeriodQueryHandler : IRequestHandler<RamMetricGetByPeriodQuery, RamMetricResponse>
+        public class HddMetricGetByPeriodQueryHandler : IRequestHandler<HddMetricGetByPeriodQuery, HddMetricResponse>
         {
-            private readonly IRamMetricsRepository _repository;
+            private readonly IHddMetricsRepository _repository;
             private readonly IMapper _mapper;
 
-            public RamMetricGetByPeriodQueryHandler(IRamMetricsRepository repository, IMapper mapper)
+            public HddMetricGetByPeriodQueryHandler(IHddMetricsRepository repository, IMapper mapper)
             {
                 _repository = repository;
                 _mapper = mapper;
             }
 
-            public async Task<RamMetricResponse> Handle(RamMetricGetByPeriodQuery request, CancellationToken cancellationToken)
+            public async Task<HddMetricResponse> Handle(HddMetricGetByPeriodQuery request, CancellationToken cancellationToken)
             {
                 var result = await Task.Run(() =>
                 {
                     var metricsList = _repository.GetByPeriod(request.FromTime, request.ToTime);
 
-                    var response = new RamMetricResponse();
+                    var response = new HddMetricResponse();
 
-                    response.Metrics.AddRange(_mapper.Map<List<RamMetricDto>>(metricsList));
+                    response.Metrics.AddRange(_mapper.Map<List<HddMetricDto>>(metricsList));
 
                     return response;
                 });

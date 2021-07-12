@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using MetricsManager.Responses;
+using MetricsManager.Responses.Metrics;
 using MetricsManager.DAL.Interfaces;
 
 using AutoMapper;
 
-namespace MetricsManager.Features.Queries
+namespace MetricsManager.Features.Queries.Metrics
 {
-    public class NetworkMetricGetByPeriodFromAgentQuery : IRequest<NetworkMetricResponse>
+    public class NetworkMetricGetByPeriodQuery : IRequest<NetworkMetricResponse>
     {
-        public int AgentId { get; set; }
-
         public DateTimeOffset FromTime { get; set; }
 
         public DateTimeOffset ToTime { get; set; }
@@ -23,22 +21,22 @@ namespace MetricsManager.Features.Queries
             return $"FromTime={FromTime} ToTime={ToTime}";
         }
 
-        public class NetworkMetricGetByPeriodQueryFromAgentHandler : IRequestHandler<NetworkMetricGetByPeriodFromAgentQuery, NetworkMetricResponse>
+        public class NetworkMetricGetByPeriodQueryHandler : IRequestHandler<NetworkMetricGetByPeriodQuery, NetworkMetricResponse>
         {
             private readonly INetworkMetricsRepository _repository;
             private readonly IMapper _mapper;
 
-            public NetworkMetricGetByPeriodQueryFromAgentHandler(INetworkMetricsRepository repository, IMapper mapper)
+            public NetworkMetricGetByPeriodQueryHandler(INetworkMetricsRepository repository, IMapper mapper)
             {
                 _repository = repository;
                 _mapper = mapper;
             }
 
-            public async Task<NetworkMetricResponse> Handle(NetworkMetricGetByPeriodFromAgentQuery request, CancellationToken cancellationToken)
+            public async Task<NetworkMetricResponse> Handle(NetworkMetricGetByPeriodQuery request, CancellationToken cancellationToken)
             {
                 var result = await Task.Run(() =>
                 {
-                    var metricsList = _repository.GetByPeriodFormAgent(request.AgentId, request.FromTime, request.ToTime);
+                    var metricsList = _repository.GetByPeriod(request.FromTime, request.ToTime);
 
                     var response = new NetworkMetricResponse();
 

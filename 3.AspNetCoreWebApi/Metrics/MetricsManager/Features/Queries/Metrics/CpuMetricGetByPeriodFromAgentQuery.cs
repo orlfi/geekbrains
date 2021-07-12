@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using MetricsManager.Responses;
+using MetricsManager.Responses.Metrics;
 using MetricsManager.DAL.Interfaces;
 
 using AutoMapper;
 
-namespace MetricsManager.Features.Queries
+namespace MetricsManager.Features.Queries.Metrics
 {
     public class CpuMetricGetByPeriodFromAgentQuery : IRequest<CpuMetricResponse>
     {

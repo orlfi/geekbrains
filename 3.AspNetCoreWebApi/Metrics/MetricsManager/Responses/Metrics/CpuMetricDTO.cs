@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MetricsManager.Responses
+namespace MetricsManager.Responses.Metrics
 {
-    public class DotNetMetricDto
+    public class CpuMetricDto
     {
         public int Id { get; set; }
 

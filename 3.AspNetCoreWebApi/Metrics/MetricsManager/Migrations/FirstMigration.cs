@@ -40,7 +40,8 @@ namespace MetricsManager.Migrations
 
             Create.Table("Agents")
                 .WithColumn("AgentId").AsInt64().PrimaryKey().Identity()
-                .WithColumn("AgentUrl").AsInt64();
+                .WithColumn("AgentUrl").AsString()
+                .WithColumn("Enabled").AsInt32();
         }
 
         public override void Down()

@@ -6,7 +6,7 @@ using MetricsManager.DAL.Interfaces;
 
 namespace MetricsManager.DAL.Interfaces
 {
-    public interface ICpuMetricsRepository : IRepository<CpuMetric>, IClusterRepository<CpuMetric>
+    public interface ICpuMetricsRepository : IRepository<CpuMetric>, IClusterMetricsRepository<CpuMetric>, IGetByPeriodRepository<CpuMetric>
     {
     }
 }

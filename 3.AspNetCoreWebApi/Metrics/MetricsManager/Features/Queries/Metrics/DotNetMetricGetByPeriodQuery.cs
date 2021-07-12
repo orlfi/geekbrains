@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using MetricsManager.Responses;
+using MetricsManager.Responses.Metrics;
 using MetricsManager.DAL.Interfaces;
 
 using AutoMapper;
 
-namespace MetricsManager.Features.Queries
+namespace MetricsManager.Features.Queries.Metrics
 {
-    public class CpuMetricGetByPeriodQuery : IRequest<CpuMetricResponse>
+    public class DotNetMetricGetByPeriodQuery : IRequest<DotNetMetricResponse>
     {
         public DateTimeOffset FromTime { get; set; }
 
@@ -21,26 +21,26 @@ namespace MetricsManager.Features.Queries
             return $"FromTime={FromTime} ToTime={ToTime}";
         }
 
-        public class CpuMetricGetByPeriodQueryHandler : IRequestHandler<CpuMetricGetByPeriodQuery, CpuMetricResponse>
+        public class DotNetMetricGetByPeriodQueryHandler : IRequestHandler<DotNetMetricGetByPeriodQuery, DotNetMetricResponse>
         {
-            private readonly ICpuMetricsRepository _repository;
+            private readonly IDotNetMetricsRepository _repository;
             private readonly IMapper _mapper;
 
-            public CpuMetricGetByPeriodQueryHandler(ICpuMetricsRepository repository, IMapper mapper)
+            public DotNetMetricGetByPeriodQueryHandler(IDotNetMetricsRepository repository, IMapper mapper)
             {
                 _repository = repository;
                 _mapper = mapper;
             }
 
-            public async Task<CpuMetricResponse> Handle(CpuMetricGetByPeriodQuery request, CancellationToken cancellationToken)
+            public async Task<DotNetMetricResponse> Handle(DotNetMetricGetByPeriodQuery request, CancellationToken cancellationToken)
             {
                 var result = await Task.Run(() =>
                 {
                     var metricsList = _repository.GetByPeriod(request.FromTime, request.ToTime);
 
-                    var response = new CpuMetricResponse();
+                    var response = new DotNetMetricResponse();
 
-                    response.Metrics.AddRange(_mapper.Map<List<CpuMetricDto>>(metricsList));
+                    response.Metrics.AddRange(_mapper.Map<List<DotNetMetricDto>>(metricsList));
 
                     return response;
                 });

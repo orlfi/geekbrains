@@ -5,7 +5,7 @@ using MetricsManager.DAL.Models;
 
 namespace MetricsManager.DAL.Interfaces
 {
-    public interface INetworkMetricsRepository : IRepository<NetworkMetric>, IClusterRepository<NetworkMetric>
+    public interface INetworkMetricsRepository : IRepository<NetworkMetric>, IClusterMetricsRepository<NetworkMetric>, IGetByPeriodRepository<NetworkMetric>
     {
     }
 }

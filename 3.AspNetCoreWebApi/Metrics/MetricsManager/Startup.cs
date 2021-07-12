@@ -38,6 +38,7 @@ namespace MetricsManager
             _connectionManager = new ConnectionManager(Configuration);
 
             services.AddControllers();
+            services.AddSingleton<IAgentsRepository, AgentsRepository>();
             services.AddSingleton<ICpuMetricsRepository, CpuMetricsRepository>();
             services.AddSingleton<IDotNetMetricsRepository, DotNetMetricsRepository>();
             services.AddSingleton<IHddMetricsRepository, HddMetricsRepository>();
@@ -66,11 +67,11 @@ namespace MetricsManager
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(rb => rb
-                    // добавляем поддержку SQLite 
+                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ SQLite 
                     .AddSQLite()
-                    // устанавливаем строку подключения
+                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                     .WithGlobalConnectionString(_connectionManager.ConnectionString)
-                    // подсказываем где искать классы с миграциями
+                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                     .ScanIn(typeof(Startup).Assembly).For.Migrations()
                 ).AddLogging(lb => lb
                     .AddFluentMigratorConsole());

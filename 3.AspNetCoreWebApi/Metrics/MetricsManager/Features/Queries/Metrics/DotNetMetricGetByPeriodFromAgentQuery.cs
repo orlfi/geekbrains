@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using MetricsManager.Responses;
+using MetricsManager.Responses.Metrics;
 using MetricsManager.DAL.Interfaces;
 
 using AutoMapper;
 
-namespace MetricsManager.Features.Queries
+namespace MetricsManager.Features.Queries.Metrics
 {
-    public class DotNetMetricGetByPeriodQuery : IRequest<DotNetMetricResponse>
+    public class DotNetMetricGetByPeriodFromAgentQuery : IRequest<DotNetMetricResponse>
     {
+        public int AgentId { get; set; }
+
         public DateTimeOffset FromTime { get; set; }
 
         public DateTimeOffset ToTime { get; set; }
@@ -21,22 +23,22 @@ namespace MetricsManager.Features.Queries
             return $"FromTime={FromTime} ToTime={ToTime}";
         }
 
-        public class DotNetMetricGetByPeriodQueryHandler : IRequestHandler<DotNetMetricGetByPeriodQuery, DotNetMetricResponse>
+        public class DotNetMetricGetByPeriodQueryFromAgentHandler : IRequestHandler<DotNetMetricGetByPeriodFromAgentQuery, DotNetMetricResponse>
         {
             private readonly IDotNetMetricsRepository _repository;
             private readonly IMapper _mapper;
 
-            public DotNetMetricGetByPeriodQueryHandler(IDotNetMetricsRepository repository, IMapper mapper)
+            public DotNetMetricGetByPeriodQueryFromAgentHandler(IDotNetMetricsRepository repository, IMapper mapper)
             {
                 _repository = repository;
                 _mapper = mapper;
             }
 
-            public async Task<DotNetMetricResponse> Handle(DotNetMetricGetByPeriodQuery request, CancellationToken cancellationToken)
+            public async Task<DotNetMetricResponse> Handle(DotNetMetricGetByPeriodFromAgentQuery request, CancellationToken cancellationToken)
             {
                 var result = await Task.Run(() =>
                 {
-                    var metricsList = _repository.GetByPeriod(request.FromTime, request.ToTime);
+                    var metricsList = _repository.GetByPeriodFormAgent(request.AgentId, request.FromTime, request.ToTime);
 
                     var response = new DotNetMetricResponse();
 
