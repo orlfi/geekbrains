@@ -22,7 +22,7 @@ namespace MetricsAgent.Controllers
             _logger.LogDebug(1, "Logger dependency injected to HddMetricsController");
         }
 
-        [HttpGet("left/from/{fromTime}/to/{toTime}")]
+        [HttpGet("disk-time/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsByPeriod([FromRoute] HddMetricGetByPeriodQuery request)
         {
             _logger.LogInformation($"Parameters: {request}");

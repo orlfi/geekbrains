@@ -27,11 +27,11 @@ namespace MetricsManager.Features.Queries.Metrics
             {
                 var result = await Task.Run(() =>
                 {
-                    var metricsList = _repository.GetRegistered();
+                    var agentsList = _repository.GetRegistered();
 
                     var response = new AgentInfoResponse();
 
-                    response.Metrics.AddRange(_mapper.Map<List<AgentInfoDto>>(metricsList));
+                    response.Agents.AddRange(_mapper.Map<List<AgentInfoDto>>(agentsList));
 
                     return response;
                 });

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 
-namespace MetricsManager.DAL
+namespace MetricsManager.DAL.DapperMapingHandlers
 {
     public class DateTimeOffsetMappingHandler : SqlMapper.TypeHandler<DateTimeOffset>
     {

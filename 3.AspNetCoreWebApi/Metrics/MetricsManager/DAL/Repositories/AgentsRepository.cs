@@ -16,59 +16,30 @@ namespace MetricsManager.DAL.Repositories
         public void Create(AgentInfo item)
         {
             var connection = _connectionManager.GetOpenedConnection();
-            connection.Execute("CREATE Agents SET (AgentAddress, Enabled) VALUES (@AgentAddress, @Enabled)",
+            connection.Execute("INSERT INTO  Agents (AgentUrl, Enabled) VALUES (@AgentUrl, @Enabled)",
                 new
                 {
-                    item.AgentAddress,
+                    item.AgentUrl,
                     item.Enabled
                 });
-        }
-
-        public void DisableById(int agentId)
-        {
-            SetStateById(agentId, false);
         }
 
         public void EnableById(int agentId)
         {
             SetStateById(agentId, true);
         }
+        
+        public void DisableById(int agentId)
+        {
+            SetStateById(agentId, false);
+        }
 
         public IList<AgentInfo> GetRegistered()
         {
             var connection = _connectionManager.GetOpenedConnection();
 
-            var result = connection.Query<AgentInfo>("SELECT AgentId, AgentAddress, Enabled FROM Agents").ToList();
+            var result = connection.Query<AgentInfo>("SELECT AgentId, AgentUrl, Enabled FROM Agents").ToList();
             
-            return result;
-        }
-
-        public IList<AgentInfo> GetByPeriod(DateTimeOffset fromTime, DateTimeOffset toTime)
-        {
-            var connection = _connectionManager.GetOpenedConnection();
-
-            var result = connection.Query<AgentInfo>("SELECT Id, AgentId, Value, Time FROM CpuMetrics WHERE Time >= @FromTime AND Time <= @ToTime",
-                new
-                {
-                    FromTime = fromTime,
-                    ToTime = toTime
-                }).ToList();
-            
-            return result;
-        }
-
-        public IList<AgentInfo> GetByPeriodFormAgent(int agentId, DateTimeOffset fromTime, DateTimeOffset toTime)
-        {
-            var connection = _connectionManager.GetOpenedConnection();
-
-            var result = connection.Query<AgentInfo>("SELECT Id, AgentId, Value, Time FROM CpuMetrics WHERE Time >= @FromTime AND Time <= @ToTime AND AgentId = @AgentId",
-                new
-                {
-                    AgentId = agentId,
-                    FromTime = fromTime,
-                    ToTime = toTime
-                }).ToList();
-
             return result;
         }
 

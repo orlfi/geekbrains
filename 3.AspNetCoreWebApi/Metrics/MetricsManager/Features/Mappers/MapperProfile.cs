@@ -6,6 +6,7 @@ using AutoMapper;
 using MetricsManager.DAL.Models;
 using MetricsManager.Responses.Metrics;
 using MetricsManager.Responses.Agents;
+using MetricsManager.Features.Commands;
 
 namespace MetricsManager.Features.Mappers
 {
@@ -14,6 +15,7 @@ namespace MetricsManager.Features.Mappers
         public MapperProfile()
         {
             CreateMap<AgentInfo, AgentInfoDto>();
+            CreateMap<RegisterAgentCommand, AgentInfo>();
 
             CreateMap<CpuMetric, CpuMetricDto>();
 

@@ -44,7 +44,7 @@ namespace MetricsManager.DAL.Repositories
         {
             var connection = _connectionManager.GetOpenedConnection();
 
-            var result = connection.Query<RamMetric>("SELECT Id, AgentId, Value, Time FROM RamMetric WHERE Time >= @FromTime AND Time <= @ToTime AND AgentId = @AgentId",
+            var result = connection.Query<RamMetric>("SELECT Id, AgentId, Value, Time FROM RamMetrics WHERE Time >= @FromTime AND Time <= @ToTime AND AgentId = @AgentId",
                 new
                 {
                     AgentId = agentId,

@@ -44,7 +44,7 @@ namespace MetricsManager.DAL.Repositories
         {
             var connection = _connectionManager.GetOpenedConnection();
 
-            var result = connection.Query<NetworkMetric>("SELECT Id, AgentId, Value, Time FROM NetworkMetric WHERE Time >= @FromTime AND Time <= @ToTime AND AgentId = @AgentId",
+            var result = connection.Query<NetworkMetric>("SELECT Id, AgentId, Value, Time FROM NetworkMetrics WHERE Time >= @FromTime AND Time <= @ToTime AND AgentId = @AgentId",
                 new
                 {
                     AgentId = agentId,

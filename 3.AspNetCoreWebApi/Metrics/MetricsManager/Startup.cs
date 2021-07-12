@@ -18,6 +18,7 @@ using Quartz;
 using Quartz.Spi;
 using Quartz.Impl;
 using FluentMigrator.Runner;
+using MetricsManager.DAL.DapperMapingHandlers;
 
 namespace MetricsManager
 {
@@ -63,15 +64,15 @@ namespace MetricsManager
             services.AddSingleton(new JobSchedule(typeof(RamMetricJob), "0/5 * * * * ?"));
             services.AddHostedService<QuartsHostedService>();
 
-            ConfigureDapperMapperForDateTimeOffset();
+            ConfigureDapperMappers();
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(rb => rb
-                    // ��������� ��������� SQLite 
+                    // добавляем поддержку SQLite 
                     .AddSQLite()
-                    // ������������� ������ �����������
+                    // устанавливаем строку подключения
                     .WithGlobalConnectionString(_connectionManager.ConnectionString)
-                    // ������������ ��� ������ ������ � ����������
+                    // подсказываем где искать классы с миграциями
                     .ScanIn(typeof(Startup).Assembly).For.Migrations()
                 ).AddLogging(lb => lb
                     .AddFluentMigratorConsole());
@@ -100,11 +101,14 @@ namespace MetricsManager
             migrationRunner.MigrateUp();
         }
 
-        private void ConfigureDapperMapperForDateTimeOffset()
+        private void ConfigureDapperMappers()
         {
             SqlMapper.AddTypeHandler(new DateTimeOffsetMappingHandler());
             SqlMapper.RemoveTypeMap(typeof(DateTimeOffset));
             SqlMapper.RemoveTypeMap(typeof(DateTimeOffset?));
+
+            SqlMapper.AddTypeHandler(new UriMappingHandler());
+            SqlMapper.RemoveTypeMap(typeof(Uri));
         }
     }
 }
