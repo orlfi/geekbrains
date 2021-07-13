@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using MetricsManager.Responses.Agents;
-using MetricsManager.DAL.Interfaces;
+using MetricsManager.DAL.Interfaces.Repositories;
 
 using AutoMapper;
 

@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using MetricsManager.DAL.Interfaces;
+using MetricsManager.DAL.Interfaces.Repositories;
 using MetricsManager.DAL.Models;
 using AutoMapper;
 

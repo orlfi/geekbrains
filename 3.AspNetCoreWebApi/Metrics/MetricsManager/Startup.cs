@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Reflection;
 using MetricsManager.DAL.Repositories;
-using MetricsManager.DAL.Interfaces;
+using MetricsManager.DAL.Interfaces.Repositories;
 using MetricsManager.DAL;
 using Core.Interfaces;
 using MediatR;
@@ -19,6 +19,9 @@ using Quartz.Spi;
 using Quartz.Impl;
 using FluentMigrator.Runner;
 using MetricsManager.DAL.DapperMapingHandlers;
+using MetricsManager.ApiClients.Interfaces;
+using MetricsManager.ApiClients.Clients;
+using Polly;
 
 namespace MetricsManager
 {
@@ -57,12 +60,16 @@ namespace MetricsManager
             services.AddSingleton<HddMetricJob>();
             services.AddSingleton<NetworkMetricJob>();
             services.AddSingleton<RamMetricJob>();
-            services.AddSingleton(new JobSchedule(typeof(CpuMetricJob), "0/5 * * * * ?"));
+            services.AddSingleton(new JobSchedule(typeof(CpuMetricJob), "0/20 * * * * ?"));
             services.AddSingleton(new JobSchedule(typeof(DotNetMetricJob), "0/5 * * * * ?"));
             services.AddSingleton(new JobSchedule(typeof(HddMetricJob), "0/5 * * * * ?"));
             services.AddSingleton(new JobSchedule(typeof(NetworkMetricJob), "0/5 * * * * ?"));
             services.AddSingleton(new JobSchedule(typeof(RamMetricJob), "0/5 * * * * ?"));
             services.AddHostedService<QuartsHostedService>();
+
+            services.AddHttpClient<ICpuMetricsAgentClient, CpuMetricsAgentClient>();
+                // .AddTransientHttpErrorPolicy(p => 
+                //     p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(1000)));
 
             ConfigureDapperMappers();
 

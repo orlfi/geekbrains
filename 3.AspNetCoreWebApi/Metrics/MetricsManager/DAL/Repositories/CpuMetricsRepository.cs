@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.Interfaces;
-using MetricsManager.DAL.Interfaces;
+using MetricsManager.DAL.Interfaces.Repositories;
 using MetricsManager.DAL.Models;
 using System.Linq;
 using Dapper;
@@ -50,6 +50,19 @@ namespace MetricsManager.DAL.Repositories
                     FromTime = fromTime,
                     ToTime = toTime
                 }).ToList();
+
+            return result;
+        }
+
+        public DateTimeOffset GetMetricsLastDateFormAgent(int agentId)
+        {
+            var connection = _connectionManager.GetOpenedConnection();
+
+            var result = connection.ExecuteScalar<DateTimeOffset>("SELECT Max(Time) FROM CpuMetrics WHERE AgentId = @AgentId",
+                new
+                {
+                    AgentId = agentId
+                });
 
             return result;
         }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.Interfaces;
-using MetricsManager.DAL.Interfaces;
+using MetricsManager.DAL.Interfaces.Repositories;
 using MetricsManager.DAL.Models;
 using System.Linq;
 using Dapper;

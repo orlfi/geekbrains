@@ -42,6 +42,36 @@ namespace MetricsManager.Migrations
                 .WithColumn("AgentId").AsInt64().PrimaryKey().Identity()
                 .WithColumn("AgentUrl").AsString()
                 .WithColumn("Enabled").AsInt32();
+
+            Create.Index("Idx_CpuMetrics_Time_Unique")
+                .OnTable("CpuMetrics")
+                .OnColumn("AgentId").Ascending()
+                .OnColumn("Time").Ascending()
+                .WithOptions().Unique();
+
+            Create.Index("Idx_DotNetMetrics_Time_Unique")
+                .OnTable("DotNetMetrics")
+                .OnColumn("AgentId").Ascending()
+                .OnColumn("Time").Ascending()
+                .WithOptions().Unique();
+
+            Create.Index("Idx_HddMetrics_Time_Unique")
+                .OnTable("HddMetrics")
+                .OnColumn("AgentId").Ascending()
+                .OnColumn("Time").Ascending()
+                .WithOptions().Unique();
+
+            Create.Index("Idx_RamMetrics_Time_Unique")
+                .OnTable("RamMetrics")
+                .OnColumn("AgentId").Ascending()
+                .OnColumn("Time").Ascending()
+                .WithOptions().Unique();
+
+            Create.Index("Idx_NetworkMetrics_Time_Unique")
+                .OnTable("NetworkMetrics")
+                .OnColumn("AgentId").Ascending()
+                .OnColumn("Time").Ascending()
+                .WithOptions().Unique();
         }
 
         public override void Down()

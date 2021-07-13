@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Core.Interfaces;
 using MetricsManager.DAL.Models;
 
-namespace MetricsManager.DAL.Interfaces
+namespace MetricsManager.DAL.Interfaces.Repositories
 {
     public interface IAgentsRepository: IRepository<AgentInfo>
     {

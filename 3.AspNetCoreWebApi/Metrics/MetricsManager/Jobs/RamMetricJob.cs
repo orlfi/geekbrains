@@ -1,7 +1,7 @@
 ﻿using Quartz;
 using System;
 using System.Threading.Tasks;
-using MetricsManager.DAL.Interfaces;
+using MetricsManager.DAL.Interfaces.Repositories;
 using MetricsManager.DAL.Models;
 using Microsoft.Extensions.Logging;
 
