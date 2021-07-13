@@ -7,6 +7,7 @@ using MetricsManager.DAL.Models;
 using MetricsManager.Responses.Metrics;
 using MetricsManager.Responses.Agents;
 using MetricsManager.Features.Commands;
+using Core.Responses;
 
 namespace MetricsManager.Features.Mappers
 {
@@ -18,6 +19,7 @@ namespace MetricsManager.Features.Mappers
             CreateMap<RegisterAgentCommand, AgentInfo>();
 
             CreateMap<CpuMetric, CpuMetricDto>();
+            CreateMap<AgentCpuMetricDto, CpuMetric>();
 
             CreateMap<RamMetric, RamMetricDto>();
 

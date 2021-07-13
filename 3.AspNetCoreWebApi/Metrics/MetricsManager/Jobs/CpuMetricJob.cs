@@ -43,7 +43,7 @@ namespace MetricsManager.Jobs
         {
             try
             {
-                var lastTime = _metricsRepository.GetMetricsLastDateFormAgent(agentInfo.AgentId);
+                var lastTime = _metricsRepository.GetMetricsLastDateFormAgent(agentInfo.AgentId).AddSeconds(1);
                 var response = _agentClient.GetMetrics(new CpuMetricClientRequest
                 {
                     BaseUrl = agentInfo.AgentUrl,
@@ -52,7 +52,9 @@ namespace MetricsManager.Jobs
                 });
                 foreach (var clientMetric in response.Metrics)
                 {
-                    _metricsRepository.Create(_mapper.Map<CpuMetric>(clientMetric));
+                    var cpuMetric = _mapper.Map<CpuMetric>(clientMetric);
+                    cpuMetric.AgentId = agentInfo.AgentId;
+                    _metricsRepository.Create(cpuMetric);
                 }
                 _logger.LogDebug($"Sincronized {response.Metrics.Count} CpuMetrics");
             }

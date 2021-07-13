@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MetricsAgent.Responses
+namespace Core.Responses
 {
-    public class DotNetMetricDto
+    public class AgentNetworkMetricDto
     {
         public int Id { get; set; }
 

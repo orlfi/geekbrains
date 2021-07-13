@@ -9,7 +9,7 @@ using Moq;
 using Microsoft.Extensions.Logging;
 using MediatR;
 using MetricsAgent.Features.Queries;
-using MetricsAgent.Responses;
+using Core.Responses;
 
 namespace MetricsAgentTests
 {
@@ -35,11 +35,11 @@ namespace MetricsAgentTests
                 ToTime = DateTimeOffset.Now
             };
             _mockMediator.Setup(mediator => mediator.Send(It.IsAny<CpuMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new CpuMetricResponse()
+                .ReturnsAsync(new AgentCpuMetricResponse()
                 {
-                    Metrics = new List<CpuMetricDto>()
+                    Metrics = new List<AgentCpuMetricDto>()
                     {
-                       new CpuMetricDto()
+                       new AgentCpuMetricDto()
                        {
                            Id = 1,
                            Time = DateTimeOffset.Now,
@@ -49,7 +49,7 @@ namespace MetricsAgentTests
                 });
 
             var result = await _controller.GetMetricsByPeriod(request);
-            var resultValue = ((OkObjectResult)result).Value as CpuMetricResponse;
+            var resultValue = ((OkObjectResult)result).Value as AgentCpuMetricResponse;
 
             _mockMediator.Verify(mediator => mediator.Send(It.Is<CpuMetricGetByPeriodQuery>(
                 m => m.FromTime == request.FromTime && m.ToTime == request.ToTime),
@@ -69,7 +69,7 @@ namespace MetricsAgentTests
                 FromTime = DateTimeOffset.Now.AddDays(-5),
                 ToTime = DateTimeOffset.Now
             };
-            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<CpuMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new CpuMetricResponse());
+            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<CpuMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new AgentCpuMetricResponse());
             var logText = $"Parameters: FromTime={request.FromTime} ToTime={request.ToTime}";
 
             _ = _controller.GetMetricsByPeriod(request);

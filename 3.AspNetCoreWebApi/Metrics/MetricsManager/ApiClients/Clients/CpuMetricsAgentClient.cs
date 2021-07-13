@@ -2,7 +2,7 @@ using System;
 using System.Net.Http;
 using MetricsManager.ApiClients.Interfaces;
 using MetricsManager.ApiClients.Requests;
-using MetricsManager.Responses.Metrics;
+using Core.Responses;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
@@ -15,7 +15,7 @@ namespace MetricsManager.ApiClients.Clients
 
         public CpuMetricsAgentClient(HttpClient httpClient, ILogger<CpuMetricsAgentClient> logger) => (_httpClient, _logger) = (httpClient, logger);
 
-        public CpuMetricResponse GetMetrics(CpuMetricClientRequest request)
+        public AgentCpuMetricResponse GetMetrics(CpuMetricClientRequest request)
         {
 
             string url = $"{request.BaseUrl}api/metrics/cpu/from/{request.FromTime:o}/to/{request.ToTime:o}";
@@ -24,11 +24,8 @@ namespace MetricsManager.ApiClients.Clients
             try
             {
                 var responseMessage = _httpClient.SendAsync(requestMessage).Result;
-                string responseStream = responseMessage.Content.ReadAsStringAsync().Result;
-                var result = JsonSerializer.Deserialize<CpuMetricResponse>(responseStream);
-                return null;
-                // using var responseStream = responseMessage.Content.ReadAsStreamAsync().Result;
-                // return JsonSerializer.DeserializeAsync<CpuMetricResponse>(responseStream).Result;
+                using var responseStream = responseMessage.Content.ReadAsStreamAsync().Result;
+                return JsonSerializer.DeserializeAsync<AgentCpuMetricResponse>(responseStream).Result;
             }
             catch (Exception ex)
             {

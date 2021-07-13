@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using AutoMapper;
 using MetricsAgent.Features.Queries;
 using MediatR;
 

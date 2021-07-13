@@ -1,14 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MetricsAgent.DAL.Interfaces;
-using MetricsAgent.DAL.Models;
-using MetricsAgent.Responses;
-using AutoMapper;
 using MetricsAgent.Features.Queries;
 using MediatR;
 

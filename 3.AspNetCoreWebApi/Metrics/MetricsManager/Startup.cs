@@ -41,7 +41,8 @@ namespace MetricsManager
         {
             _connectionManager = new ConnectionManager(Configuration);
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);
             services.AddSingleton<IAgentsRepository, AgentsRepository>();
             services.AddSingleton<ICpuMetricsRepository, CpuMetricsRepository>();
             services.AddSingleton<IDotNetMetricsRepository, DotNetMetricsRepository>();

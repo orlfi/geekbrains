@@ -9,7 +9,7 @@ using Moq;
 using Microsoft.Extensions.Logging;
 using MediatR;
 using MetricsAgent.Features.Queries;
-using MetricsAgent.Responses;
+using Core.Responses;
 
 namespace MetricsAgentTests
 {
@@ -35,11 +35,11 @@ namespace MetricsAgentTests
                 ToTime = DateTimeOffset.Now
             };
             _mockMediator.Setup(mediator => mediator.Send(It.IsAny<NetworkMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new NetworkMetricResponse()
+                .ReturnsAsync(new AgentNetworkMetricResponse()
                 {
-                    Metrics = new List<NetworkMetricDto>()
+                    Metrics = new List<AgentNetworkMetricDto>()
                     {
-                       new NetworkMetricDto()
+                       new AgentNetworkMetricDto()
                        {
                            Id = 1,
                            Time = DateTimeOffset.Now,
@@ -49,7 +49,7 @@ namespace MetricsAgentTests
                 });
 
             var result = await _controller.GetMetricsByPeriod(request);
-            var resultValue = ((OkObjectResult)result).Value as NetworkMetricResponse;
+            var resultValue = ((OkObjectResult)result).Value as AgentNetworkMetricResponse;
 
             _mockMediator.Verify(mediator => mediator.Send(It.Is<NetworkMetricGetByPeriodQuery>(
                 m => m.FromTime == request.FromTime && m.ToTime == request.ToTime),
@@ -69,7 +69,7 @@ namespace MetricsAgentTests
                 FromTime = DateTimeOffset.Now.AddDays(-5),
                 ToTime = DateTimeOffset.Now
             };
-            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<NetworkMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new NetworkMetricResponse());
+            _mockMediator.Setup(mediator => mediator.Send(It.IsAny<NetworkMetricGetByPeriodQuery>(), It.IsAny<CancellationToken>())).ReturnsAsync(new AgentNetworkMetricResponse());
             var logText = $"Parameters: FromTime={request.FromTime} ToTime={request.ToTime}";
 
             _ = _controller.GetMetricsByPeriod(request);

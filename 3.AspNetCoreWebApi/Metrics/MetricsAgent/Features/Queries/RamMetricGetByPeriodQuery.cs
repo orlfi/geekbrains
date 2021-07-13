@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using MetricsAgent.Responses;
+using Core.Responses;
 using MetricsAgent.DAL.Interfaces;
 
 using AutoMapper;
 
 namespace MetricsAgent.Features.Queries
 {
-    public class RamMetricGetByPeriodQuery : IRequest<RamMetricResponse>
+    public class RamMetricGetByPeriodQuery : IRequest<AgentRamMetricResponse>
     {
         public DateTimeOffset FromTime { get; set; }
 
@@ -21,7 +21,7 @@ namespace MetricsAgent.Features.Queries
             return $"FromTime={FromTime} ToTime={ToTime}";
         }
 
-        public class RamMetricGetByPeriodQueryHandler : IRequestHandler<RamMetricGetByPeriodQuery, RamMetricResponse>
+        public class RamMetricGetByPeriodQueryHandler : IRequestHandler<RamMetricGetByPeriodQuery, AgentRamMetricResponse>
         {
             private readonly IRamMetricsRepository _repository;
             private readonly IMapper _mapper;
@@ -32,15 +32,15 @@ namespace MetricsAgent.Features.Queries
                 _mapper = mapper;
             }
 
-            public async Task<RamMetricResponse> Handle(RamMetricGetByPeriodQuery request, CancellationToken cancellationToken)
+            public async Task<AgentRamMetricResponse> Handle(RamMetricGetByPeriodQuery request, CancellationToken cancellationToken)
             {
                 var result = await Task.Run(() =>
                 {
                     var metricsList = _repository.GetByPeriod(request.FromTime, request.ToTime);
 
-                    var response = new RamMetricResponse();
+                    var response = new AgentRamMetricResponse();
 
-                    response.Metrics.AddRange(_mapper.Map<List<RamMetricDto>>(metricsList));
+                    response.Metrics.AddRange(_mapper.Map<List<AgentRamMetricDto>>(metricsList));
 
                     return response;
                 });
