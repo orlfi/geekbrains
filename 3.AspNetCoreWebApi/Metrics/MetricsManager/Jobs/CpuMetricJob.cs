@@ -41,7 +41,6 @@ namespace MetricsManager.Jobs
             {
                 await SyncronizeMetricsFromAgent(agent);
             }
-            //return Task.CompletedTask;
         }
 
         private async Task SyncronizeMetricsFromAgent(AgentInfo agentInfo)
