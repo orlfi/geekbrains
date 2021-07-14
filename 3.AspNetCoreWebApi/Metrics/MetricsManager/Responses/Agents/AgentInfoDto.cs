@@ -9,6 +9,6 @@ namespace MetricsManager.Responses.Agents
     {
         public int AgentId { get; set; }
         public Uri AgentUrl { get; set; }
-        public bool Enabled { get; set; }
+        public bool IsEnabled { get; set; }
     }
 }

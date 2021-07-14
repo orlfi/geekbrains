@@ -29,7 +29,7 @@ namespace MetricsManager.Controllers
         [HttpGet("agent/{agentId}/heap-size/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsFromAgent([FromRoute] DotNetMetricGetByPeriodFromAgentQuery request)
         {
-            _logger.LogInformation($"Parameters: {request}");
+            _logger.LogInformation($"DotNet GetMetricsFromAgent Parameters: {request}");
 
             var response = await _mediator.Send(request);
 
@@ -39,7 +39,7 @@ namespace MetricsManager.Controllers
         [HttpGet("cluster/heap-size/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsFromAllCluster([FromRoute] DotNetMetricGetByPeriodQuery request)
         {
-            _logger.LogInformation($"Parameters: {request}");
+            _logger.LogInformation($"DotNet GetMetricsFromAllCluster Parameters: {request}");
 
             var response = await _mediator.Send(request);
 

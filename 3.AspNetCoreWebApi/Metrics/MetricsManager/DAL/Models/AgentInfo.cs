@@ -9,6 +9,11 @@ namespace MetricsManager.DAL.Models
     {
         public int AgentId { get; set; }
         public Uri AgentUrl { get; set; }
-        public bool Enabled { get; set; }
+        public bool IsEnabled { get; set; }
+
+        public override string ToString()
+        {
+            return $"ID: {AgentId}, URL: {AgentUrl}, IsEnabled: {IsEnabled}";
+        }
     }
 }

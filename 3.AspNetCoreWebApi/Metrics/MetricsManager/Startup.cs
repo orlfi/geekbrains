@@ -61,26 +61,38 @@ namespace MetricsManager
             services.AddSingleton<HddMetricJob>();
             services.AddSingleton<NetworkMetricJob>();
             services.AddSingleton<RamMetricJob>();
-            services.AddSingleton(new JobSchedule(typeof(CpuMetricJob), "0/20 * * * * ?"));
+            services.AddSingleton(new JobSchedule(typeof(CpuMetricJob), "0/5 * * * * ?"));
             services.AddSingleton(new JobSchedule(typeof(DotNetMetricJob), "0/5 * * * * ?"));
             services.AddSingleton(new JobSchedule(typeof(HddMetricJob), "0/5 * * * * ?"));
             services.AddSingleton(new JobSchedule(typeof(NetworkMetricJob), "0/5 * * * * ?"));
             services.AddSingleton(new JobSchedule(typeof(RamMetricJob), "0/5 * * * * ?"));
             services.AddHostedService<QuartsHostedService>();
 
-            services.AddHttpClient<ICpuMetricsAgentClient, CpuMetricsAgentClient>();
-                // .AddTransientHttpErrorPolicy(p => 
-                //     p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(1000)));
+            services.AddHttpClient<ICpuMetricsAgentClient, CpuMetricsAgentClient>()
+                .AddTransientHttpErrorPolicy(p => 
+                    p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(1000)));
+            services.AddHttpClient<IDotNetMetricsAgentClient, DotNetMetricsAgentClient>()
+                .AddTransientHttpErrorPolicy(p => 
+                    p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(1000)));
+            services.AddHttpClient<IHddMetricsAgentClient, HddMetricsAgentClient>()
+                .AddTransientHttpErrorPolicy(p => 
+                    p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(1000)));
+            services.AddHttpClient<INetworkMetricsAgentClient, NetworkMetricsAgentClient>()
+                .AddTransientHttpErrorPolicy(p => 
+                    p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(1000)));
+            services.AddHttpClient<IRamMetricsAgentClient, RamMetricsAgentClient>()
+                .AddTransientHttpErrorPolicy(p => 
+                    p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(1000)));
 
             ConfigureDapperMappers();
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(rb => rb
-                    // добавляем поддержку SQLite 
+                    // adding SQLite support
                     .AddSQLite()
-                    // устанавливаем строку подключения
+                    // setting the connection string
                     .WithGlobalConnectionString(_connectionManager.ConnectionString)
-                    // подсказываем где искать классы с миграциями
+                    // we suggest where to look for classes with migrations
                     .ScanIn(typeof(Startup).Assembly).For.Migrations()
                 ).AddLogging(lb => lb
                     .AddFluentMigratorConsole());

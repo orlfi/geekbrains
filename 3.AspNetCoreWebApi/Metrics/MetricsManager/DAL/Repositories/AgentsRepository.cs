@@ -16,11 +16,11 @@ namespace MetricsManager.DAL.Repositories
         public void Create(AgentInfo item)
         {
             var connection = _connectionManager.GetOpenedConnection();
-            connection.Execute("INSERT INTO  Agents (AgentUrl, Enabled) VALUES (@AgentUrl, @Enabled)",
+            connection.Execute("INSERT INTO  Agents (AgentUrl, IsEnabled) VALUES (@AgentUrl, @IsEnabled)",
                 new
                 {
                     item.AgentUrl,
-                    item.Enabled
+                    item.IsEnabled
                 });
         }
 
@@ -38,7 +38,7 @@ namespace MetricsManager.DAL.Repositories
         {
             var connection = _connectionManager.GetOpenedConnection();
 
-            var result = connection.Query<AgentInfo>("SELECT AgentId, AgentUrl, Enabled FROM Agents").ToList();
+            var result = connection.Query<AgentInfo>("SELECT AgentId, AgentUrl, IsEnabled FROM Agents").ToList();
             
             return result;
         }
@@ -46,7 +46,7 @@ namespace MetricsManager.DAL.Repositories
         private void SetStateById(int agentId, bool state)
         {
             var connection = _connectionManager.GetOpenedConnection();
-            connection.Execute("UPDATE Agents SET Enabled = @state WHERE AgentId = @agentId",
+            connection.Execute("UPDATE Agents SET IsEnabled = @state WHERE AgentId = @agentId",
                 new
                 {
                     agentId,

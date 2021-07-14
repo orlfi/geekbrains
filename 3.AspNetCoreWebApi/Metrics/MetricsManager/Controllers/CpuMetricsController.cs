@@ -26,7 +26,7 @@ namespace MetricsManager.Controllers
         [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsFromAgent([FromRoute] CpuMetricGetByPeriodFromAgentQuery request)
         {
-            _logger.LogInformation($"Parameters: {request}");
+            _logger.LogInformation($"CPU GetMetricsFromAgent Parameters: {request}");
 
             var response = await _mediator.Send(request);
 
@@ -36,7 +36,7 @@ namespace MetricsManager.Controllers
         [HttpGet("cluster/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsFromAllCluster([FromRoute] CpuMetricGetByPeriodQuery request)
         {
-            _logger.LogInformation($"Parameters: {request}");
+            _logger.LogInformation($"CPU GetMetricsFromAllCluster Parameters: {request}");
 
             var response = await _mediator.Send(request);
 

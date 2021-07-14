@@ -20,7 +20,12 @@ namespace MetricsManager.Jobs
         private readonly ICpuMetricsAgentClient _agentClient;
         private readonly IMapper _mapper;
 
-        public CpuMetricJob(ICpuMetricsRepository metricsRepository, IAgentsRepository agentsRepository, ILogger<CpuMetricJob> logger, ICpuMetricsAgentClient agentClient, IMapper mapper)
+        public CpuMetricJob(
+            ICpuMetricsRepository metricsRepository, 
+            IAgentsRepository agentsRepository, 
+            ILogger<CpuMetricJob> logger, 
+            ICpuMetricsAgentClient agentClient, 
+            IMapper mapper)
         {
             _metricsRepository = metricsRepository;
             _agentsRepository = agentsRepository;
@@ -29,34 +34,39 @@ namespace MetricsManager.Jobs
             _mapper = mapper;
         }
 
-        public Task Execute(IJobExecutionContext context)
+        public async Task Execute(IJobExecutionContext context)
         {
-            var enabledAgents = _agentsRepository.GetRegistered().Where(item => item.Enabled);
+            var enabledAgents = _agentsRepository.GetRegistered().Where(item => item.IsEnabled);
             foreach (var agent in enabledAgents)
             {
-                SyncronizeMetricsFromAgent(agent);
+                await SyncronizeMetricsFromAgent(agent);
             }
-            return Task.CompletedTask;
+            //return Task.CompletedTask;
         }
 
-        private void SyncronizeMetricsFromAgent(AgentInfo agentInfo)
+        private async Task SyncronizeMetricsFromAgent(AgentInfo agentInfo)
         {
             try
             {
                 var lastTime = _metricsRepository.GetMetricsLastDateFormAgent(agentInfo.AgentId).AddSeconds(1);
-                var response = _agentClient.GetMetrics(new CpuMetricClientRequest
+                var response = await _agentClient.GetMetrics(new CpuMetricClientRequest
                 {
                     BaseUrl = agentInfo.AgentUrl,
                     FromTime = lastTime,
                     ToTime = DateTimeOffset.Now
                 });
+
+                if (response == null)
+                    return;
+
                 foreach (var clientMetric in response.Metrics)
                 {
                     var cpuMetric = _mapper.Map<CpuMetric>(clientMetric);
                     cpuMetric.AgentId = agentInfo.AgentId;
                     _metricsRepository.Create(cpuMetric);
                 }
-                _logger.LogDebug($"Sincronized {response.Metrics.Count} CpuMetrics");
+                
+                _logger.LogDebug($"Sincronized {response.Metrics.Count} Cpu Metrics from Agent ({agentInfo})");
             }
             catch (Exception ex)
             {

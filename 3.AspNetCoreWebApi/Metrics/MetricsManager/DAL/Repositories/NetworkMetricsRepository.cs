@@ -17,12 +17,12 @@ namespace MetricsManager.DAL.Repositories
         public void Create(NetworkMetric item)
         {
             var connection = _connectionManager.GetOpenedConnection();
-
-            connection.Execute("INSERT INTO NetworkMetrics(Value, Time) VALUES (@Value, @Time)",
+            connection.Execute("INSERT INTO NetworkMetrics(AgentId, Value, Time) VALUES (@AgentId, @Value, @Time)",
                 new
                 {
+                    item.AgentId,
                     item.Value,
-                    Time = item.Time.ToUnixTimeSeconds()
+                    item.Time
                 });
         }
 
@@ -30,7 +30,7 @@ namespace MetricsManager.DAL.Repositories
         {
             var connection = _connectionManager.GetOpenedConnection();
 
-            var result = connection.Query<NetworkMetric>("SELECT Id, Value, Time FROM NetworkMetrics WHERE Time >= @FromTime AND Time <= @ToTime",
+            var result = connection.Query<NetworkMetric>("SELECT Id, AgentId, Value, Time FROM NetworkMetrics WHERE Time >= @FromTime AND Time <= @ToTime",
                 new
                 {
                     FromTime = fromTime.ToUnixTimeSeconds(),
@@ -57,7 +57,15 @@ namespace MetricsManager.DAL.Repositories
 
         public DateTimeOffset GetMetricsLastDateFormAgent(int agentId)
         {
-            throw new NotImplementedException();
+            var connection = _connectionManager.GetOpenedConnection();
+
+            var result = connection.ExecuteScalar<DateTimeOffset>("SELECT Max(Time) FROM NetworkMetrics WHERE AgentId = @AgentId",
+                new
+                {
+                    AgentId = agentId
+                });
+
+            return result;
         }
     }
 }

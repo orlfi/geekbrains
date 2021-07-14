@@ -41,7 +41,7 @@ namespace MetricsManager.Migrations
             Create.Table("Agents")
                 .WithColumn("AgentId").AsInt64().PrimaryKey().Identity()
                 .WithColumn("AgentUrl").AsString()
-                .WithColumn("Enabled").AsInt32();
+                .WithColumn("IsEnabled").AsInt32();
 
             Create.Index("Idx_CpuMetrics_Time_Unique")
                 .OnTable("CpuMetrics")

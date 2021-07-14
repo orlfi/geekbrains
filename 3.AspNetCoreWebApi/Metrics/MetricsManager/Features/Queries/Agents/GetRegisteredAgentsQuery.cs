@@ -8,7 +8,7 @@ using MetricsManager.DAL.Interfaces.Repositories;
 
 using AutoMapper;
 
-namespace MetricsManager.Features.Queries.Metrics
+namespace MetricsManager.Features.Queries.Agents
 {
     public class GetRegisteredAgentsQuery : IRequest<AgentInfoResponse>
     {

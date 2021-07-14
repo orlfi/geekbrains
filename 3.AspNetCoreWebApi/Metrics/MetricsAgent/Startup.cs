@@ -56,7 +56,7 @@ namespace MetricsAgent
             services.AddSingleton<HddMetricJob>();
             services.AddSingleton<NetworkMetricJob>();
             services.AddSingleton<RamMetricJob>();
-            services.AddSingleton(new JobSchedule(typeof(CpuMetricJob), "0/10 * * * * ?"));
+            services.AddSingleton(new JobSchedule(typeof(CpuMetricJob), "0/5 * * * * ?"));
             services.AddSingleton(new JobSchedule(typeof(DotNetMetricJob), "0/5 * * * * ?"));
             services.AddSingleton(new JobSchedule(typeof(HddMetricJob), "0/5 * * * * ?"));
             services.AddSingleton(new JobSchedule(typeof(NetworkMetricJob), "0/5 * * * * ?"));

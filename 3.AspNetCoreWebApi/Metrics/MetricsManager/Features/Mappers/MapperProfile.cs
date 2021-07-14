@@ -21,13 +21,17 @@ namespace MetricsManager.Features.Mappers
             CreateMap<CpuMetric, CpuMetricDto>();
             CreateMap<AgentCpuMetricDto, CpuMetric>();
 
-            CreateMap<RamMetric, RamMetricDto>();
-
-            CreateMap<NetworkMetric, NetworkMetricDto>();
+            CreateMap<DotNetMetric, DotNetMetricDto>();
+            CreateMap<AgentDotNetMetricDto, DotNetMetric>();
 
             CreateMap<HddMetric, HddMetricDto>();
+            CreateMap<AgentHddMetricDto, HddMetric>();
 
-            CreateMap<DotNetMetric, DotNetMetricDto>();
+            CreateMap<NetworkMetric, NetworkMetricDto>();
+            CreateMap<AgentNetworkMetricDto, NetworkMetric>();
+
+            CreateMap<RamMetric, RamMetricDto>();
+            CreateMap<AgentRamMetricDto, RamMetric>();
         }
     }
 }

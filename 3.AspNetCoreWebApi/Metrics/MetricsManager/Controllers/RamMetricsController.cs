@@ -28,7 +28,7 @@ namespace MetricsManager.Controllers
         [HttpGet("agent/{agentId}/available/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsFromAgent([FromRoute] RamMetricGetByPeriodFromAgentQuery request)
         {
-            _logger.LogInformation($"Parameters: {request}");
+            _logger.LogInformation($"Ram GetMetricsFromAgent Parameters: {request}");
 
             var response = await _mediator.Send(request);
 
@@ -38,7 +38,7 @@ namespace MetricsManager.Controllers
         [HttpGet("cluster/available/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsFromAllCluster([FromRoute] RamMetricGetByPeriodQuery request)
         {
-            _logger.LogInformation($"Parameters: {request}");
+            _logger.LogInformation($"Ram GetMetricsFromAllCluster Parameters: {request}");
 
             var response = await _mediator.Send(request);
 

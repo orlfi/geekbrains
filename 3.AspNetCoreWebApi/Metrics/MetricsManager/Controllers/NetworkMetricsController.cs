@@ -28,7 +28,7 @@ namespace MetricsManager.Controllers
         [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsFromAgent([FromRoute] NetworkMetricGetByPeriodFromAgentQuery request)
         {
-            _logger.LogInformation($"Parameters: {request}");
+            _logger.LogInformation($"Network GetMetricsFromAgent Parameters: {request}");
 
             var response = await _mediator.Send(request);
 
@@ -38,7 +38,7 @@ namespace MetricsManager.Controllers
         [HttpGet("cluster/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsFromAllCluster([FromRoute] NetworkMetricGetByPeriodQuery request)
         {
-            _logger.LogInformation($"Parameters: {request}");
+            _logger.LogInformation($"Network GetMetricsFromAllCluster Parameters: {request}");
 
             var response = await _mediator.Send(request);
 

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using MetricsManager.Features.Queries.Metrics;
+using MetricsManager.Features.Queries.Agents;
 using MetricsManager.Features.Commands;
 
 namespace MetricsManager.Controllers
@@ -35,7 +35,7 @@ namespace MetricsManager.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAgent([FromBody]RegisterAgentCommand command)
         {
-            _logger.LogInformation($"Parameters: command={command}");
+            _logger.LogInformation($"Register Agent Parameters: command={command}");
 
             await _mediator.Send(command);
 
@@ -45,7 +45,7 @@ namespace MetricsManager.Controllers
         [HttpPut("enable/{agentId}")]
         public async Task<IActionResult> EnableAgentById([FromRoute] EnableAgentByIdCommand command)
         {
-            _logger.LogInformation($"Parameters: command={command}");
+            _logger.LogInformation($"EnableAgentById Parameters: command={command}");
 
             await _mediator.Send(command);
 
@@ -55,7 +55,7 @@ namespace MetricsManager.Controllers
         [HttpPut("disable/{agentId}")]
         public async Task<IActionResult> DisableAgentById([FromRoute] DisableAgentByIdCommand command)
         {
-            _logger.LogInformation($"Parameters: command={command}");
+            _logger.LogInformation($"DisableAgentById Parameters: command={command}");
 
             await _mediator.Send(command);
 

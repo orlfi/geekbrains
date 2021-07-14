@@ -12,12 +12,12 @@ namespace MetricsManager.Features.Commands
     {
         public Uri AgentUrl { get; set; }
 
-        public bool Enabled { get; set; }
+        public bool IsEnabled { get; set; }
 
         
         public override string ToString()
         {
-            return $"{{ AgentAddress={AgentUrl}, Enabled={Enabled}}}";
+            return $"{{ AgentAddress={AgentUrl}, Enabled={IsEnabled}}}";
         }
 
         public class RegisterAgentCommandHandler : IRequestHandler<RegisterAgentCommand>

@@ -17,10 +17,10 @@ namespace MetricsManager.DAL.Repositories
         public void Create(DotNetMetric item)
         {
             var connection = _connectionManager.GetOpenedConnection();
-
-            connection.Execute("INSERT INTO DotNetMetrics(Value, Time) VALUES (@Value, @Time)",
+            connection.Execute("INSERT INTO DotNetMetrics(AgentId, Value, Time) VALUES (@AgentId, @Value, @Time)",
                 new
                 {
+                    item.AgentId,
                     item.Value,
                     item.Time
                 });
@@ -30,7 +30,7 @@ namespace MetricsManager.DAL.Repositories
         {
             var connection = _connectionManager.GetOpenedConnection();
 
-            var result = connection.Query<DotNetMetric>("SELECT Id, Value, Time FROM DotNetMetrics WHERE Time >= @FromTime AND Time <= @ToTime",
+            var result = connection.Query<DotNetMetric>("SELECT Id, AgentId, Value, Time FROM DotNetMetrics WHERE Time >= @FromTime AND Time <= @ToTime",
                 new
                 {
                     FromTime = fromTime,
@@ -54,10 +54,17 @@ namespace MetricsManager.DAL.Repositories
 
             return result;
         }
-
         public DateTimeOffset GetMetricsLastDateFormAgent(int agentId)
         {
-            throw new NotImplementedException();
+            var connection = _connectionManager.GetOpenedConnection();
+
+            var result = connection.ExecuteScalar<DateTimeOffset>("SELECT Max(Time) FROM DotNetMetrics WHERE AgentId = @AgentId",
+                new
+                {
+                    AgentId = agentId
+                });
+
+            return result;
         }
     }
 }
