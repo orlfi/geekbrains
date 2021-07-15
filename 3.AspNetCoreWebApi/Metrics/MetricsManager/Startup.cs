@@ -66,7 +66,8 @@ namespace MetricsManager
             services.AddSingleton(new JobSchedule(typeof(HddMetricJob), "0/5 * * * * ?"));
             services.AddSingleton(new JobSchedule(typeof(NetworkMetricJob), "0/5 * * * * ?"));
             services.AddSingleton(new JobSchedule(typeof(RamMetricJob), "0/5 * * * * ?"));
-            services.AddHostedService<QuartsHostedService>();
+            services.AddSingleton<QuartsHostedService>();
+            services.AddHostedService<QuartsHostedService>(provider => provider.GetService<QuartsHostedService>());
 
             services.AddHttpClient<ICpuMetricsAgentClient, CpuMetricsAgentClient>()
                 .AddTransientHttpErrorPolicy(p => 

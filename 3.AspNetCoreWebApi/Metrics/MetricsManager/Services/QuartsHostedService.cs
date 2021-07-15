@@ -1,10 +1,13 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Quartz;
 using Quartz.Spi;
+using Quartz.Impl;
+using Quartz.Impl.Matchers;
 using MetricsManager.Jobs;
 
 namespace MetricsManager.Services
@@ -13,7 +16,7 @@ namespace MetricsManager.Services
     {
         ISchedulerFactory _schedulerFactory;
 
-        IScheduler _scheduler;
+        public IScheduler Scheduler {get;set;}
 
         IJobFactory _jobFactory;
 
@@ -28,21 +31,21 @@ namespace MetricsManager.Services
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _scheduler = await _schedulerFactory.GetScheduler(cancellationToken);
-            _scheduler.JobFactory = _jobFactory;
+            Scheduler = await _schedulerFactory.GetScheduler(cancellationToken);
+            Scheduler.JobFactory = _jobFactory;
 
             foreach(var jobSchedule in _jobSchedules)
             {
                 IJobDetail jobDetail = CreateJobDetail(jobSchedule);
                 ITrigger jobTrigger = CreateJobTrigger(jobSchedule);
-                await _scheduler.ScheduleJob(jobDetail, jobTrigger, cancellationToken);
+                await Scheduler.ScheduleJob(jobDetail, jobTrigger, cancellationToken);
             }
-            await _scheduler.Start(cancellationToken);
+            await Scheduler.Start(cancellationToken);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            await _scheduler?.Shutdown(cancellationToken);
+            await Scheduler?.Shutdown(cancellationToken);
         }
 
         private IJobDetail CreateJobDetail(JobSchedule jobSchedule)
