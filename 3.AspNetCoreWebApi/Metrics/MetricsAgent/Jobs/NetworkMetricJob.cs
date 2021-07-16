@@ -13,8 +13,8 @@ namespace MetricsAgent.Jobs
     [DisallowConcurrentExecution]
     public class NetworkMetricJob : IJob
     {
-        private INetworkMetricsRepository _repository;
-        List<System.Diagnostics.PerformanceCounter> _networkCounters;
+        private readonly INetworkMetricsRepository _repository;
+        private readonly List<System.Diagnostics.PerformanceCounter> _networkCounters;
         private readonly ILogger<NetworkMetricJob> _logger;
 
         public NetworkMetricJob(INetworkMetricsRepository repository, ILogger<NetworkMetricJob> logger)

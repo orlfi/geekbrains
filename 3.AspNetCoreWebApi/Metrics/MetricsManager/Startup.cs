@@ -1,10 +1,11 @@
+using System;
+using System.IO;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Reflection;
 using MetricsManager.DAL.Repositories;
 using MetricsManager.DAL.Interfaces.Repositories;
 using MetricsManager.DAL;
@@ -22,6 +23,7 @@ using MetricsManager.DAL.DapperMapingHandlers;
 using MetricsManager.ApiClients.Interfaces;
 using MetricsManager.ApiClients.Clients;
 using Polly;
+using Microsoft.OpenApi.Models;
 
 namespace MetricsManager
 {
@@ -70,22 +72,49 @@ namespace MetricsManager
             services.AddHostedService<QuartsHostedService>(provider => provider.GetService<QuartsHostedService>());
 
             services.AddHttpClient<ICpuMetricsAgentClient, CpuMetricsAgentClient>()
-                .AddTransientHttpErrorPolicy(p => 
+                .AddTransientHttpErrorPolicy(p =>
                     p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(1000)));
             services.AddHttpClient<IDotNetMetricsAgentClient, DotNetMetricsAgentClient>()
-                .AddTransientHttpErrorPolicy(p => 
+                .AddTransientHttpErrorPolicy(p =>
                     p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(1000)));
             services.AddHttpClient<IHddMetricsAgentClient, HddMetricsAgentClient>()
-                .AddTransientHttpErrorPolicy(p => 
+                .AddTransientHttpErrorPolicy(p =>
                     p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(1000)));
             services.AddHttpClient<INetworkMetricsAgentClient, NetworkMetricsAgentClient>()
-                .AddTransientHttpErrorPolicy(p => 
+                .AddTransientHttpErrorPolicy(p =>
                     p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(1000)));
             services.AddHttpClient<IRamMetricsAgentClient, RamMetricsAgentClient>()
-                .AddTransientHttpErrorPolicy(p => 
+                .AddTransientHttpErrorPolicy(p =>
                     p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(1000)));
 
-            ConfigureDapperMappers();
+            services.AddSwaggerGen(setup =>
+            {
+                setup.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "Metric collection agent service API",
+                    Description = @"Provides collection data
+                        Loading processor, Free Memory
+                        Using hard disk, Return speed over the network
+                        Heap size  from registered agents",
+                    TermsOfService = new Uri("https://example.com/terms"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Orlikov Fedor",
+                        Email = "orlfi@mail.ru",
+                        Url = new Uri("https://orlfi.tk"),
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "MIT",
+                        Url = new Uri("https://example.com/license"),
+                    }
+                });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                setup.IncludeXmlComments(xmlPath);
+            });
 
             services.AddFluentMigratorCore()
                 .ConfigureRunner(rb => rb
@@ -98,6 +127,7 @@ namespace MetricsManager
                 ).AddLogging(lb => lb
                     .AddFluentMigratorConsole());
 
+            ConfigureDapperMappers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -117,6 +147,13 @@ namespace MetricsManager
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API сервиса агента сбора метрик");
+                c.RoutePrefix = string.Empty;
             });
 
             migrationRunner.MigrateUp();

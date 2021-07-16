@@ -12,8 +12,8 @@ namespace MetricsAgent.Jobs
     [DisallowConcurrentExecution]
     public class RamMetricJob : IJob
     {
-        private IRamMetricsRepository _repository;
-        private PerformanceCounter _ramCounter;
+        private readonly IRamMetricsRepository _repository;
+        private readonly PerformanceCounter _ramCounter;
         private readonly ILogger<RamMetricJob> _logger;
 
         public RamMetricJob(IRamMetricsRepository repository, ILogger<RamMetricJob> logger)

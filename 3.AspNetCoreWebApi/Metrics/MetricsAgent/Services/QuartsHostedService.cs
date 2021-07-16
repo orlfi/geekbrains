@@ -11,13 +11,13 @@ namespace MetricsAgent.Services
 { 
     public class QuartsHostedService : IHostedService
     {
-        ISchedulerFactory _schedulerFactory;
+        private readonly ISchedulerFactory _schedulerFactory;
 
-        IScheduler _scheduler;
+        private IScheduler _scheduler;
 
-        IJobFactory _jobFactory;
+        private readonly IJobFactory _jobFactory;
 
-        IEnumerable<JobSchedule> _jobSchedules;
+        private readonly IEnumerable<JobSchedule> _jobSchedules;
 
         public QuartsHostedService(ISchedulerFactory schedulerFactory, IJobFactory jobFactory, IEnumerable<JobSchedule> jobSchedules)
         {

@@ -25,6 +25,17 @@ namespace MetricsManager.Controllers
             _logger.LogDebug(1, "Logger dependency injected to HddMetricsController");
         }
 
+        /// <summary>
+        /// Gets HDD metrics on a given time range
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     GET api/metrics/hdd/agent/1/from/2021-07-01/to/2021-07-10
+        ///
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <response code="200">If everything is ok</response>
         [HttpGet("agent/{agentId}/disk-time/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsFromAgent([FromRoute] HddMetricGetByPeriodFromAgentQuery request)
         {
@@ -35,6 +46,17 @@ namespace MetricsManager.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Gets HDD metrics on a given time range from all agents
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     GET api/metrics/hdd/cluster/from/2021-07-01/to/2021-07-10
+        ///
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <response code="200">If everything is ok</response>
         [HttpGet("cluster/disk-time/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsFromAllCluster([FromRoute] HddMetricGetByPeriodQuery request)
         {

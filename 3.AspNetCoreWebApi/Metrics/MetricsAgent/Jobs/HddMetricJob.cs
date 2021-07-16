@@ -12,8 +12,8 @@ namespace MetricsAgent.Jobs
     [DisallowConcurrentExecution]
     public class HddMetricJob : IJob
     {
-        private IHddMetricsRepository _repository;
-        private PerformanceCounter _hddCounter;
+        private readonly IHddMetricsRepository _repository;
+        private readonly PerformanceCounter _hddCounter;
         private readonly ILogger<HddMetricJob> _logger;
 
         public HddMetricJob(IHddMetricsRepository repository, ILogger<HddMetricJob> logger)

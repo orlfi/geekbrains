@@ -13,15 +13,17 @@ namespace MetricsManager.DAL.Repositories
         private readonly IConnectionManager _connectionManager;
         public AgentsRepository(IConnectionManager connectionManager) => _connectionManager = connectionManager;
 
-        public void Create(AgentInfo item)
+        public AgentInfo Create(AgentInfo agentInfo)
         {
             var connection = _connectionManager.GetOpenedConnection();
             connection.Execute("INSERT INTO  Agents (AgentUrl, IsEnabled) VALUES (@AgentUrl, @IsEnabled)",
                 new
                 {
-                    item.AgentUrl,
-                    item.IsEnabled
+                    agentInfo.AgentUrl,
+                    agentInfo.IsEnabled
                 });
+                agentInfo.AgentId = (int)connection.LastInsertRowId;
+                return agentInfo;
         }
 
         public void EnableById(int agentId)

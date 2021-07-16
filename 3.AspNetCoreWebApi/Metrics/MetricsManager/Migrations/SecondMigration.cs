@@ -1,30 +1,21 @@
-// using FluentMigrator;
-// using FluentMigrator.Infrastructure;
+using FluentMigrator;
+using FluentMigrator.Infrastructure;
 
-// namespace MetricsManager.Migrations
-// {
-//     [Migration(2)]
-//     public class SecondMigration : Migration
-//     {
-//         public override void Up()
-//         {
-//             Alter.Table("Agents").AlterColumn("Enabled").
-                        
-//             // .Table("Agents")
-//             //     .WithColumn("AgentId").AsInt64().PrimaryKey().Identity()
-//             //     .WithColumn("AgentUrl").AsString()
-//             //     .WithColumn("Enabled").AsInt32();
-            
+namespace MetricsManager.Migrations
+{
+    [Migration(2)]
+    public class SecondMigration : Migration
+    {
+        public override void Up()
+        {
+            Create.Index("Idx_Agents_AgentUrl_Unique")
+                .OnTable("Agents")
+                .OnColumn("AgentUrl").Ascending()
+                .WithOptions().Unique();
+        }
 
-//             // Create.Index("Idx_NetworkMetrics_Time_Unique")
-//             //     .OnTable("NetworkMetrics")
-//             //     .OnColumn("AgentId").Ascending()
-//             //     .OnColumn("Time").Ascending()
-//             //     .WithOptions().Unique();
-//         }
-
-//         public override void Down()
-//         {
-//         }
-//     }
-// }
+        public override void Down()
+        {
+        }
+    }
+}

@@ -22,7 +22,18 @@ namespace MetricsManager.Controllers
 
             _logger.LogDebug(1, "Logger dependency injected to CpuMetricsController");
         }
-
+        
+        /// <summary>
+        /// Gets CPU metrics on a given time range
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     GET api/metrics/cpu/agent/1/from/2021-07-01/to/2021-07-10
+        ///
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <response code="200">If everything is ok</response>
         [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsFromAgent([FromRoute] CpuMetricGetByPeriodFromAgentQuery request)
         {
@@ -33,6 +44,17 @@ namespace MetricsManager.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Gets CPU metrics on a given time range from all agents
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     GET api/metrics/cpu/cluster/from/2021-07-01/to/2021-07-10
+        ///
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <response code="200">If everything is ok</response>
         [HttpGet("cluster/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsFromAllCluster([FromRoute] CpuMetricGetByPeriodQuery request)
         {

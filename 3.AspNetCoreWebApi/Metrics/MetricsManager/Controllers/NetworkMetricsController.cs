@@ -25,6 +25,17 @@ namespace MetricsManager.Controllers
             _logger.LogDebug(1, "Logger dependency injected to NetworkMetricsController");
         }
 
+        /// <summary>
+        /// Gets Network metrics on a given time range
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     GET api/metrics/network/agent/1/from/2021-07-01/to/2021-07-10
+        ///
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <response code="200">If everything is ok</response>
         [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsFromAgent([FromRoute] NetworkMetricGetByPeriodFromAgentQuery request)
         {
@@ -35,6 +46,17 @@ namespace MetricsManager.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Gets Network metrics on a given time range from all agents
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     GET api/metrics/network/cluster/from/2021-07-01/to/2021-07-10
+        ///
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <response code="200">If everything is ok</response>
         [HttpGet("cluster/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsFromAllCluster([FromRoute] NetworkMetricGetByPeriodQuery request)
         {

@@ -7,26 +7,26 @@ using Quartz.Impl.Matchers;
 using MetricsManager.Services;
 using MetricsManager.Features.Extensions;
 
-namespace MetricsManager.Features.Commands
+namespace MetricsManager.Features.Commands.Jobs
 {
-    public class ResumeJobCommand : IRequest
+    public class PauseJobCommand : IRequest
     {
         public string JobName { get; set; }
 
-        public class ResumeJobCommandHandler : IRequestHandler<ResumeJobCommand>
+        public class PauseJobCommandHandler : IRequestHandler<PauseJobCommand>
         {
             private readonly IScheduler _scheduler;
 
-            public ResumeJobCommandHandler(QuartsHostedService scheduleService) => _scheduler = scheduleService.Scheduler;
+            public PauseJobCommandHandler(QuartsHostedService scheduleService) => _scheduler = scheduleService.Scheduler;
 
-            public async Task<Unit> Handle(ResumeJobCommand request, CancellationToken cancellationToken)
+            public async Task<Unit> Handle(PauseJobCommand request, CancellationToken cancellationToken)
             {
-                string jobKeyName = $"MetricsManager.Jobs.{request.JobName.FirstCharToUpper()}MetricJob" + request.JobName;
+                string jobKeyName = $"MetricsManager.Jobs.{request.JobName}";
                 var jobKeys = await _scheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup());
                 var jobKey = jobKeys.SingleOrDefault(key => key.Name == jobKeyName);
                 
                 if (jobKey != null)
-                    await _scheduler.ResumeJob(jobKey);
+                    await _scheduler.PauseJob(jobKey);
 
                 return Unit.Value;
             }

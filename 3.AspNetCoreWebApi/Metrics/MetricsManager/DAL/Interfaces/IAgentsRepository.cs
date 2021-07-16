@@ -7,8 +7,10 @@ using MetricsManager.DAL.Models;
 
 namespace MetricsManager.DAL.Interfaces.Repositories
 {
-    public interface IAgentsRepository: IRepository<AgentInfo>
+    public interface IAgentsRepository
     {
+        AgentInfo Create(AgentInfo item);
+
         IList<AgentInfo> GetRegistered();
 
         void EnableById(int agentId);

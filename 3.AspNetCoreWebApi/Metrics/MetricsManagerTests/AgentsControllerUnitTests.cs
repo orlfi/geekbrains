@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using MediatR;
 using MetricsManager.Features.Queries.Agents;
 using MetricsManager.Responses.Agents;
-using MetricsManager.Features.Commands;
+using MetricsManager.Features.Commands.Agents;
 
 namespace MetricsManagerTests
 {
@@ -86,13 +86,23 @@ namespace MetricsManagerTests
                 IsEnabled = true
             };
             _mockMediator.Setup(mediator => mediator.Send(It.IsAny<RegisterAgentCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Unit.Value);
+                .ReturnsAsync(new AgentInfoDto()
+                {
+                           AgentId = 2,
+                           AgentUrl =url,
+                           IsEnabled = false
+                });
 
             var result = await _controller.RegisterAgent(command);
+            var resultValue = ((OkObjectResult)result).Value as AgentInfoDto;
 
             _mockMediator.Verify(mediator => mediator.Send(It.Is<RegisterAgentCommand>(
                 m => m.AgentUrl == command.AgentUrl && m.IsEnabled == command.IsEnabled),
                 It.IsAny<CancellationToken>()), Times.Once);
+
+            Assert.Equal(2, resultValue.AgentId);
+            Assert.Equal(url, resultValue.AgentUrl);
+            Assert.False(resultValue.IsEnabled);
             Assert.IsAssignableFrom<IActionResult>(result);
         }
 
@@ -106,7 +116,12 @@ namespace MetricsManagerTests
                 IsEnabled = true
             };
             _mockMediator.Setup(mediator => mediator.Send(It.IsAny<RegisterAgentCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Unit.Value);
+                .ReturnsAsync(new AgentInfoDto()
+                {
+                           AgentId = 2,
+                           AgentUrl =url,
+                           IsEnabled = false
+                });
             var logText = $"Register Agent Parameters: command={command}";
 
             _ = _controller.RegisterAgent(command);

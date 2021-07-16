@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using MetricsManager.Features.Queries.Agents;
-using MetricsManager.Features.Commands;
+using MetricsManager.Features.Commands.Agents;
 
 
 namespace MetricsManager.Controllers
@@ -22,6 +22,17 @@ namespace MetricsManager.Controllers
             _logger.LogDebug(1, "Logger dependency injected to AgentsController");
         }
 
+        /// <summary>
+        /// Returns information about all registered agents
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     GET api/agents
+        ///
+        /// </remarks>
+        /// <returns>List of registered agents</returns>
+        /// <response code="200">If everything is ok</response>
         [HttpGet]
         public async Task<IActionResult> GetRegisteredAgents()
         {
@@ -32,52 +43,66 @@ namespace MetricsManager.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Registers a new agent
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     GET api/agents/register
+        ///
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns>информацию о зарегистрированном объекте</returns>
+        /// <response code="200">If everything is ok</response>
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterAgent([FromBody] RegisterAgentCommand command)
+        public async Task<IActionResult> RegisterAgent([FromBody] RegisterAgentCommand request)
         {
-            _logger.LogInformation($"Register Agent Parameters: command={command}");
+            _logger.LogInformation($"Register Agent Parameters: command={request}");
 
-            await _mediator.Send(command);
+            var result = await _mediator.Send(request);
 
-            return Ok();
+            return Ok(result);
         }
 
+        /// <summary>
+        /// Enables agent
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     GET api/enable/1
+        ///
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <response code="200">If everything is ok</response>
         [HttpPut("enable/{agentId}")]
-        public async Task<IActionResult> EnableAgentById([FromRoute] EnableAgentByIdCommand command)
+        public async Task<IActionResult> EnableAgentById([FromRoute] EnableAgentByIdCommand request)
         {
-            _logger.LogInformation($"EnableAgentById Parameters: command={command}");
+            _logger.LogInformation($"EnableAgentById Parameters: command={request}");
 
-            await _mediator.Send(command);
+            await _mediator.Send(request);
 
             return Ok();
         }
 
+        /// <summary>
+        /// Disables agent
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     GET api/disable/1
+        ///
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <response code="200">If everything is ok</response>
         [HttpPut("disable/{agentId}")]
-        public async Task<IActionResult> DisableAgentById([FromRoute] DisableAgentByIdCommand command)
+        public async Task<IActionResult> DisableAgentById([FromRoute] DisableAgentByIdCommand request)
         {
-            _logger.LogInformation($"DisableAgentById Parameters: command={command}");
+            _logger.LogInformation($"DisableAgentById Parameters: command={request}");
 
-            await _mediator.Send(command);
-
-            return Ok();
-        }
-
-        [HttpPut("pause/{jobName}")]
-        public async Task<IActionResult> PauseJob([FromRoute] PauseJobCommand command)
-        {
-            _logger.LogInformation($"Pause job Parameters: command={command}");
-
-            await _mediator.Send(command);
-
-            return Ok();
-        }
-
-        [HttpPut("resume/{jobName}")]
-        public async Task<IActionResult> ResumeJob([FromRoute] ResumeJobCommand command)
-        {
-            _logger.LogInformation($"Resume job Parameters: command={command}");
-
-            await _mediator.Send(command);
+            await _mediator.Send(request);
 
             return Ok();
         }

@@ -25,6 +25,17 @@ namespace MetricsManager.Controllers
             _logger.LogDebug(1, "Logger dependency injected to RamMetricsController");
         }
 
+        /// <summary>
+        /// Gets RAM metrics on a given time range
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     GET api/metrics/ram/agent/1/from/2021-07-01/to/2021-07-10
+        ///
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <response code="200">If everything is ok</response>
         [HttpGet("agent/{agentId}/available/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsFromAgent([FromRoute] RamMetricGetByPeriodFromAgentQuery request)
         {
@@ -35,6 +46,17 @@ namespace MetricsManager.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Gets RAM metrics on a given time range from all agents
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     GET api/metrics/ram/cluster/from/2021-07-01/to/2021-07-10
+        ///
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <response code="200">If everything is ok</response>
         [HttpGet("cluster/available/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsFromAllCluster([FromRoute] RamMetricGetByPeriodQuery request)
         {

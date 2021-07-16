@@ -12,8 +12,8 @@ namespace MetricsAgent.Jobs
     [DisallowConcurrentExecution]
     public class DotNetMetricJob : IJob
     {
-        private IDotNetMetricsRepository _repository;
-        private PerformanceCounter _dotNetCounter;
+        private readonly IDotNetMetricsRepository _repository;
+        private readonly PerformanceCounter _dotNetCounter;
         private readonly ILogger<DotNetMetricJob> _logger;
 
         public DotNetMetricJob(IDotNetMetricsRepository repository, ILogger<DotNetMetricJob> logger)

@@ -6,7 +6,7 @@ using AutoMapper;
 using MetricsManager.DAL.Models;
 using MetricsManager.Responses.Metrics;
 using MetricsManager.Responses.Agents;
-using MetricsManager.Features.Commands;
+using MetricsManager.Features.Commands.Agents;
 using Core.Responses;
 
 namespace MetricsManager.Features.Mappers

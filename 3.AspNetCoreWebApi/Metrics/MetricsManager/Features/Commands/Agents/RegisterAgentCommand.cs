@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 using MediatR;
 using MetricsManager.DAL.Interfaces.Repositories;
 using MetricsManager.DAL.Models;
+using MetricsManager.Responses.Agents;
 using AutoMapper;
 
-namespace MetricsManager.Features.Commands
+namespace MetricsManager.Features.Commands.Agents
 {
-    public class RegisterAgentCommand : IRequest
+    public class RegisterAgentCommand : IRequest<AgentInfoDto>
     {
         public Uri AgentUrl { get; set; }
 
@@ -20,21 +21,21 @@ namespace MetricsManager.Features.Commands
             return $"{{ AgentAddress={AgentUrl}, Enabled={IsEnabled}}}";
         }
 
-        public class RegisterAgentCommandHandler : IRequestHandler<RegisterAgentCommand>
+        public class RegisterAgentCommandHandler : IRequestHandler<RegisterAgentCommand, AgentInfoDto>
         {
             private readonly IAgentsRepository _repository;
             private readonly IMapper _mapper;
 
             public  RegisterAgentCommandHandler(IAgentsRepository repository, IMapper mapper) => (_repository, _mapper) = (repository, mapper);
 
-            public async Task<Unit> Handle(RegisterAgentCommand request, CancellationToken cancellationToken)
+            public async Task<AgentInfoDto> Handle(RegisterAgentCommand request, CancellationToken cancellationToken)
             {
-               await Task.Run(() =>
+               var result = await Task.Run(() =>
                 {
-                    _repository.Create(_mapper.Map<AgentInfo>(request));
+                    return _mapper.Map<AgentInfoDto>(_repository.Create(_mapper.Map<AgentInfo>(request)));
                 });
                 
-                return Unit.Value;
+                return result;
             }
         }
     }

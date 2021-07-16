@@ -4,7 +4,7 @@ using MediatR;
 using MetricsManager.DAL.Interfaces.Repositories;
 using AutoMapper;
 
-namespace MetricsManager.Features.Commands
+namespace MetricsManager.Features.Commands.Agents
 {
     public class DisableAgentByIdCommand : IRequest
     {
