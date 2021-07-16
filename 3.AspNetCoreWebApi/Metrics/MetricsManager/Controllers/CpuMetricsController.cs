@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using MetricsManager.Features.Queries.Metrics;
+using MediatR;
 
 namespace MetricsManager.Controllers
 {
@@ -11,16 +12,35 @@ namespace MetricsManager.Controllers
     [ApiController]
     public class CpuMetricsController : ControllerBase
     {
-        [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]
-        public IActionResult GetMetricsFromAgent([FromRoute] int agentId, [FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
+        private readonly ILogger<CpuMetricsController> _logger;
+        private readonly IMediator _mediator;
+
+        public CpuMetricsController(ILogger<CpuMetricsController> logger, IMediator mediator)
         {
-            return Ok(new { AgentId = agentId, From = fromTime, To = toTime});
+            _logger = logger;
+            _mediator = mediator;
+
+            _logger.LogDebug(1, "Logger dependency injected to CpuMetricsController");
+        }
+
+        [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]
+        public async Task<IActionResult> GetMetricsFromAgent([FromRoute] CpuMetricGetByPeriodFromAgentQuery request)
+        {
+            _logger.LogInformation($"CPU GetMetricsFromAgent Parameters: {request}");
+
+            var response = await _mediator.Send(request);
+
+            return Ok(response);
         }
 
         [HttpGet("cluster/from/{fromTime}/to/{toTime}")]
-        public IActionResult GetMetricsFromAllCluster([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
+        public async Task<IActionResult> GetMetricsFromAllCluster([FromRoute] CpuMetricGetByPeriodQuery request)
         {
-            return Ok(new { From = fromTime, To = toTime});
+            _logger.LogInformation($"CPU GetMetricsFromAllCluster Parameters: {request}");
+
+            var response = await _mediator.Send(request);
+
+            return Ok(response);
         }
     }
 }

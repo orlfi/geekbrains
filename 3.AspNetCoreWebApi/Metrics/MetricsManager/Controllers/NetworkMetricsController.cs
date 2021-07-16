@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using MetricsManager.Features.Queries.Metrics;
+using MediatR;
 
 namespace MetricsManager.Controllers
 {
@@ -11,16 +14,35 @@ namespace MetricsManager.Controllers
     [ApiController]
     public class NetworkMetricsController : ControllerBase
     {
-        [HttpGet("agent/{agentId}/available/from/{fromTime}/to/{toTime}")]
-        public IActionResult GetMetricsFromAgent([FromRoute] int agentId, [FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
+        private readonly ILogger<NetworkMetricsController> _logger;
+        private readonly IMediator _mediator;
+
+        public NetworkMetricsController(ILogger<NetworkMetricsController> logger, IMediator mediator)
         {
-            return Ok(new { AgentId = agentId, From = fromTime, To = toTime});
+            _logger = logger;
+            _mediator = mediator;
+
+            _logger.LogDebug(1, "Logger dependency injected to NetworkMetricsController");
         }
 
-        [HttpGet("cluster/available/from/{fromTime}/to/{toTime}")]
-        public IActionResult GetMetricsFromAllCluster([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
+        [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]
+        public async Task<IActionResult> GetMetricsFromAgent([FromRoute] NetworkMetricGetByPeriodFromAgentQuery request)
         {
-            return Ok(new { From = fromTime, To = toTime});
+            _logger.LogInformation($"Network GetMetricsFromAgent Parameters: {request}");
+
+            var response = await _mediator.Send(request);
+
+            return Ok(response);
+        }
+
+        [HttpGet("cluster/from/{fromTime}/to/{toTime}")]
+        public async Task<IActionResult> GetMetricsFromAllCluster([FromRoute] NetworkMetricGetByPeriodQuery request)
+        {
+            _logger.LogInformation($"Network GetMetricsFromAllCluster Parameters: {request}");
+
+            var response = await _mediator.Send(request);
+
+            return Ok(response);
         }
     }
 }
