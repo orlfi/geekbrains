@@ -5,7 +5,7 @@ using MetricsAgent.DAL.Models;
 
 namespace MetricsAgent.DAL.Interfaces
 {
-    public interface IHddMetricsRepository : IRepository<HddMetric>
+    public interface IHddMetricsRepository : IRepository<HddMetric>, IGetByPeriodRepository<HddMetric>
     {
     }
 }

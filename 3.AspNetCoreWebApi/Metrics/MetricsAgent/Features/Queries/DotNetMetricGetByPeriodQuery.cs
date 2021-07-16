@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using MetricsAgent.Responses;
+using Core.Responses;
 using MetricsAgent.DAL.Interfaces;
 
 using AutoMapper;
 
 namespace MetricsAgent.Features.Queries
 {
-    public class DotNetMetricGetByPeriodQuery : IRequest<DotNetMetricResponse>
+    public class DotNetMetricGetByPeriodQuery : IRequest<AgentDotNetMetricResponse>
     {
         public DateTimeOffset FromTime { get; set; }
 
@@ -21,7 +21,7 @@ namespace MetricsAgent.Features.Queries
             return $"FromTime={FromTime} ToTime={ToTime}";
         }
 
-        public class DotNetMetricGetByPeriodQueryHandler : IRequestHandler<DotNetMetricGetByPeriodQuery, DotNetMetricResponse>
+        public class DotNetMetricGetByPeriodQueryHandler : IRequestHandler<DotNetMetricGetByPeriodQuery, AgentDotNetMetricResponse>
         {
             private readonly IDotNetMetricsRepository _repository;
             private readonly IMapper _mapper;
@@ -32,15 +32,15 @@ namespace MetricsAgent.Features.Queries
                 _mapper = mapper;
             }
 
-            public async Task<DotNetMetricResponse> Handle(DotNetMetricGetByPeriodQuery request, CancellationToken cancellationToken)
+            public async Task<AgentDotNetMetricResponse> Handle(DotNetMetricGetByPeriodQuery request, CancellationToken cancellationToken)
             {
                 var result = await Task.Run(() =>
                 {
                     var metricsList = _repository.GetByPeriod(request.FromTime, request.ToTime);
 
-                    var response = new DotNetMetricResponse();
+                    var response = new AgentDotNetMetricResponse();
 
-                    response.Metrics.AddRange(_mapper.Map<List<DotNetMetricDto>>(metricsList));
+                    response.Metrics.AddRange(_mapper.Map<List<AgentDotNetMetricDto>>(metricsList));
 
                     return response;
                 });

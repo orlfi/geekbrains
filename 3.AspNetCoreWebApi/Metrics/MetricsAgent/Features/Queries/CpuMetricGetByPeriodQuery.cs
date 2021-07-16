@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using MetricsAgent.Responses;
+using Core.Responses;
 using MetricsAgent.DAL.Interfaces;
 
 using AutoMapper;
 
 namespace MetricsAgent.Features.Queries
 {
-    public class CpuMetricGetByPeriodQuery : IRequest<CpuMetricResponse>
+    public class CpuMetricGetByPeriodQuery : IRequest<AgentCpuMetricResponse>
     {
         public DateTimeOffset FromTime { get; set; }
 
@@ -21,7 +21,7 @@ namespace MetricsAgent.Features.Queries
             return $"FromTime={FromTime} ToTime={ToTime}";
         }
 
-        public class CpuMetricGetByPeriodQueryHandler : IRequestHandler<CpuMetricGetByPeriodQuery, CpuMetricResponse>
+        public class CpuMetricGetByPeriodQueryHandler : IRequestHandler<CpuMetricGetByPeriodQuery, AgentCpuMetricResponse>
         {
             private readonly ICpuMetricsRepository _repository;
             private readonly IMapper _mapper;
@@ -32,15 +32,15 @@ namespace MetricsAgent.Features.Queries
                 _mapper = mapper;
             }
 
-            public async Task<CpuMetricResponse> Handle(CpuMetricGetByPeriodQuery request, CancellationToken cancellationToken)
+            public async Task<AgentCpuMetricResponse> Handle(CpuMetricGetByPeriodQuery request, CancellationToken cancellationToken)
             {
                 var result = await Task.Run(() =>
                 {
                     var metricsList = _repository.GetByPeriod(request.FromTime, request.ToTime);
 
-                    var response = new CpuMetricResponse();
+                    var response = new AgentCpuMetricResponse();
 
-                    response.Metrics.AddRange(_mapper.Map<List<CpuMetricDto>>(metricsList));
+                    response.Metrics.AddRange(_mapper.Map<List<AgentCpuMetricDto>>(metricsList));
 
                     return response;
                 });

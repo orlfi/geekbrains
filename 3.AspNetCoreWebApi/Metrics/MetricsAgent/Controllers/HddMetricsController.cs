@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MetricsAgent.Features.Queries;
-using MetricsAgent.Features.Commands;
 using MediatR;
 
 namespace MetricsAgent.Controllers
@@ -23,7 +22,7 @@ namespace MetricsAgent.Controllers
             _logger.LogDebug(1, "Logger dependency injected to HddMetricsController");
         }
 
-        [HttpGet("left/from/{fromTime}/to/{toTime}")]
+        [HttpGet("disk-time/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsByPeriod([FromRoute] HddMetricGetByPeriodQuery request)
         {
             _logger.LogInformation($"Parameters: {request}");
@@ -31,19 +30,6 @@ namespace MetricsAgent.Controllers
             var response = await _mediator.Send(request);
             
             return Ok(response);
-        }
-
-        [HttpPost("create")]
-        public async Task<IActionResult> Create([FromBody] HddMetricCreateCommand request)
-        {
-            _logger.LogInformation($"Parameters: request={request}");
-
-            if (request.Value < 0 || request.Value > 100)
-                return BadRequest("The Value must be in the range from 0 to 100");
-
-            await _mediator.Send(request);
-            
-            return Ok();
         }
     }
 }

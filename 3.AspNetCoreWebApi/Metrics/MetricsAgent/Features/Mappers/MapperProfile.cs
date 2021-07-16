@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using MetricsAgent.DAL.Models;
-using MetricsAgent.Responses;
-using MetricsAgent.Features.Commands;
+using Core.Responses;
 
 namespace MetricsAgent.Features.Mappers
 {
@@ -13,20 +8,15 @@ namespace MetricsAgent.Features.Mappers
     {
         public MapperProfile()
         {
-            CreateMap<CpuMetric, CpuMetricDto>();
-            CreateMap<CpuMetricCreateCommand, CpuMetric>();
+            CreateMap<CpuMetric, AgentCpuMetricDto>();
 
-            CreateMap<RamMetric, RamMetricDto>();
-            CreateMap<RamMetricCreateCommand, RamMetric>();
+            CreateMap<RamMetric, AgentRamMetricDto>();
 
-            CreateMap<NetworkMetric, NetworkMetricDto>();
-            CreateMap<NetworkMetricCreateCommand, NetworkMetric>();
+            CreateMap<NetworkMetric, AgentNetworkMetricDto>();
 
-            CreateMap<HddMetric, HddMetricDto>();
-            CreateMap<HddMetricCreateCommand, HddMetric>();
+            CreateMap<HddMetric, AgentHddMetricDto>();
 
-            CreateMap<DotNetMetric, DotNetMetricDto>();
-            CreateMap<DotNetMetricCreateCommand, DotNetMetric>();
+            CreateMap<DotNetMetric, AgentDotNetMetricDto>();
         }
     }
 }

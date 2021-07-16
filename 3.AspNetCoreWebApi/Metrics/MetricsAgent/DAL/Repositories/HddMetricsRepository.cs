@@ -16,7 +16,7 @@ namespace MetricsAgent.DAL.Repositories
 
         public void Create(HddMetric item)
         {
-            using var connection = _connectionManager.CreateOpenedConnection();
+            var connection = _connectionManager.GetOpenedConnection();
 
             connection.Execute("INSERT INTO HddMetrics(Value, Time) VALUES (@Value, @Time)",
                 new
@@ -28,7 +28,7 @@ namespace MetricsAgent.DAL.Repositories
 
         public IList<HddMetric> GetByPeriod(DateTimeOffset fromTime, DateTimeOffset toTime)
         {
-            using var connection = _connectionManager.CreateOpenedConnection();
+            var connection = _connectionManager.GetOpenedConnection();
 
             var result = connection.Query<HddMetric>("SELECT Id, Value, Time FROM HddMetrics WHERE Time >= @FromTime AND Time <= @ToTime",
                 new

@@ -5,14 +5,39 @@
             // Use IntelliSense to find out which attributes exist for C# debugging
             // Use hover for the description of the existing attributes
             // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
-            "name": ".NET Core Launch (web)",
+            "name": "Metrics Agent",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build MetricsAgent",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/MetricsAgent/bin/Debug/netcoreapp3.1/MetricsAgent.dll",
             "args": [],
             "cwd": "${workspaceFolder}/MetricsAgent",
+            "stopAtEntry": false,
+            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            // Use IntelliSense to find out which attributes exist for C# debugging
+            // Use hover for the description of the existing attributes
+            // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+            "name": "Metrics Manager",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build MetricsManager",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/MetricsManager/bin/Debug/netcoreapp3.1/MetricsManager.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/MetricsManager",
             "stopAtEntry": false,
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             "serverReadyAction": {

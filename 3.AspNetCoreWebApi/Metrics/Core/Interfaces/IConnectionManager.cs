@@ -7,6 +7,7 @@ namespace Core.Interfaces
 {
     public interface IConnectionManager
     {
-        SQLiteConnection CreateOpenedConnection();
+        string ConnectionString { get;}
+        SQLiteConnection GetOpenedConnection();
     }
 }

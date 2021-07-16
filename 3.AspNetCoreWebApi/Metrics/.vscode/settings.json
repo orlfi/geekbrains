@@ -2,7 +2,9 @@
     "dotnet-test-explorer.treeMode": "full",
     "cSpell.words": [
         "Mediat",
+        "Sincronized",
         "Xunit",
+        "mbytes",
         "nlog"
     ]
 }

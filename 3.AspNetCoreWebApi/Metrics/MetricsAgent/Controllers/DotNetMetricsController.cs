@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MetricsAgent.Features.Queries;
-using MetricsAgent.Features.Commands;
 using MediatR;
 
 namespace MetricsAgent.Controllers
@@ -22,7 +21,7 @@ namespace MetricsAgent.Controllers
             _logger.LogDebug(1, "Logger dependency injected to DotNetMetricsController");
         }
 
-        [HttpGet("errors-count/from/{fromTime}/to/{toTime}")]
+        [HttpGet("heap-size/from/{fromTime}/to/{toTime}")]
         public async Task<IActionResult> GetMetricsByPeriod([FromRoute] DotNetMetricGetByPeriodQuery request)
         {
             _logger.LogInformation($"Parameters: {request}");
@@ -30,19 +29,6 @@ namespace MetricsAgent.Controllers
             var response = await _mediator.Send(request);
             
             return Ok(response);
-        }
-
-        [HttpPost("create")]
-        public async Task<IActionResult> Create([FromBody] DotNetMetricCreateCommand request)
-        {
-            _logger.LogInformation($"Parameters: request={request}");
-
-            if (request.Value < 0)
-                return BadRequest("The Value must be greater than or equal to 0");
-
-            await _mediator.Send(request);
-
-            return Ok();
         }
     }
 }

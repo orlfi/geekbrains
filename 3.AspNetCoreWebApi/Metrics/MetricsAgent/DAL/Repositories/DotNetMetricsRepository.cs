@@ -16,7 +16,7 @@ namespace MetricsAgent.DAL.Repositories
 
         public void Create(DotNetMetric item)
         {
-            using var connection = _connectionManager.CreateOpenedConnection();
+            var connection = _connectionManager.GetOpenedConnection();
 
             connection.Execute("INSERT INTO DotNetMetrics(Value, Time) VALUES (@Value, @Time)",
                 new
@@ -28,7 +28,7 @@ namespace MetricsAgent.DAL.Repositories
 
         public IList<DotNetMetric> GetByPeriod(DateTimeOffset fromTime, DateTimeOffset toTime)
         {
-            using var connection = _connectionManager.CreateOpenedConnection();
+            var connection = _connectionManager.GetOpenedConnection();
 
             var result = connection.Query<DotNetMetric>("SELECT Id, Value, Time FROM DotNetMetrics WHERE Time >= @FromTime AND Time <= @ToTime",
                 new
